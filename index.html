@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FIRE AND FURY UNLEASHED</title>
+</head>
+<body style="background:#120605;color:#f3dcc0;font-family:Georgia,serif;text-align:center;padding:40px">
+🔥 Loading FIRE AND FURY UNLEASHED…
+<script>
+fetch("game.html",{cache:"no-cache"})
+  .then(function(r){ if(!r.ok) throw new Error("missing"); return r.text(); })
+  .then(function(html){
+    html = html.replace("</body>", '<script src="fx-upgrade.js"><\/script></body>');
+    document.open(); document.write(html); document.close();
+  })
+  .catch(function(){
+    document.body.innerHTML = "Could not load game.html. Make sure your original game file is named game.html, sits next to this file, and that you are opening this page from a website or local server.";
+  });
+</script>
+</body>
+</html>
