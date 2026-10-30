@@ -3,12 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>FIRE AND FURY | Arcade</title>
+<title>FIRE AND FURY | Arcade Exhibition</title>
 <meta name="theme-color" content="#160b08">
-<meta name="description" content="FIRE AND FURY — a fast-paced historical arcade action game.">
+<link rel="manifest" href="./manifest.webmanifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="description" content="FIRE AND FURY — a fast-paced 2D historical arcade action game featuring the V-2 missile.">
 <meta property="og:title" content="FIRE AND FURY">
 <meta property="og:description" content="A fast-paced historical arcade action game.">
-<meta property="og:image" content="">
+<meta name="application-name" content="FIRE AND FURY">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fire & Fury">
 <style>
 /* =====================================================
    FIRE AND FURY — single, consolidated stylesheet
@@ -1302,20 +1309,6 @@ footer{
             <div class="event"><strong>LEGACY</strong><br>
                 After the war, captured V-2s and engineers influenced the early rocket programmes of
                 the United States and the Soviet Union.</div>
-        </div>
-    </div>
-
-    <div class="card" style="margin-top:18px">
-        <h3>🚀 THE V-2: A MILESTONE IN MISSILE HISTORY</h3>
-        <div class="timeline">
-            <div class="event"><strong>1942 — FIRST SUCCESSFUL TEST FLIGHT</strong><br>
-                The V-2 completed its first successful test launch on 3 October 1942.</div>
-            <div class="event"><strong>HISTORICAL FIRST</strong><br>
-                The V-2 is widely regarded as the world's first long-range guided ballistic missile.</div>
-            <div class="event"><strong>TECHNOLOGY</strong><br>
-                It used a liquid-fuel rocket engine and an onboard guidance system.</div>
-            <div class="event"><strong>LEGACY</strong><br>
-                Its technology influenced post-war missile and space programmes. Its wartime use also caused immense civilian suffering and relied on forced labour — essential parts of its history.</div>
         </div>
     </div>
 
@@ -4523,6 +4516,34 @@ document.querySelectorAll("#howModal .how-sec").forEach(e=>{
 })();
 </script>
 
+<script>
+/* PWA install support. Installation is offered only when the browser permits it. */
+(function(){
+  let deferredInstall = null;
+  function addInstallButton(){
+    if(document.getElementById('pwaInstallButton')) return;
+    const b=document.createElement('button');
+    b.id='pwaInstallButton'; b.type='button'; b.textContent='⬇ INSTALL APP';
+    b.setAttribute('aria-label','Install FIRE AND FURY');
+    b.style.cssText='position:fixed;right:14px;bottom:14px;z-index:3000;padding:12px 16px;border:1px solid #ffd16b;border-radius:999px;background:linear-gradient(135deg,#ff9b28,#a93612);color:#190905;font-weight:900;box-shadow:0 5px 22px #0009;display:none;';
+    b.addEventListener('click',async()=>{
+      if(!deferredInstall) return;
+      deferredInstall.prompt();
+      try{await deferredInstall.userChoice;}catch(e){}
+      deferredInstall=null; b.remove();
+    });
+    document.body.appendChild(b);
+  }
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault(); deferredInstall=e; addInstallButton();
+    const b=document.getElementById('pwaInstallButton'); if(b) b.style.display='block';
+  });
+  window.addEventListener('appinstalled',()=>document.getElementById('pwaInstallButton')?.remove());
+  if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+    window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('PWA offline cache unavailable:',e)));
+  }
+})();
+</script>
+
 </body>
-</html>
 </html>
