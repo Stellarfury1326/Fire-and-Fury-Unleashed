@@ -1,22 +1,22 @@
-# 🔥 FIRE AND FURY ARCADE
+# 🔥 FIRE AND FURY UNLEASHED
 
-A browser-based action arcade game inspired by the history and military innovations of the Kingdom of Mysore.
+A browser-based action arcade game featuring V-2 missile-inspired gameplay, multiple game modes and competitive player features.
 
 ## 🎮 About the Project
 
-FIRE AND FURY ARCADE is an interactive arcade experience featuring multiple game modes, player accounts, competitive scoring and customizable profiles.
+**FIRE AND FURY UNLEASHED** is an interactive arcade experience built around action, competition and missile technology.
 
-The project is designed to run in a web browser and support both desktop and mobile screens.
+Its central historical inspiration includes the German V-2, widely recognized as the world's first long-range guided ballistic missile.
 
-## ⚔️ Game Modes
+## 🚀 Game Modes
 
-- **Rocket Battle** — An action-focused rocket battle experience.
+- **Rocket Battle** — An action-focused missile battle experience.
 - **Volcano Rush** — A challenging volcano-themed game mode.
 - **Final Fury** — An intense final challenge.
 
 ## ✨ Features
 
-- Player registration and login using Firebase.
+- Firebase-powered player authentication.
 - Player profiles and avatar customization.
 - Score tracking and gameplay history.
 - Hall of Fame and achievements.
@@ -25,8 +25,6 @@ The project is designed to run in a web browser and support both desktop and mob
 - Background music and sound effects.
 - Progressive Web App installation support.
 - Service worker for basic offline caching.
-
-*Feature availability depends on the current implementation and backend configuration.*
 
 ## 🛠️ Technology
 
@@ -40,62 +38,58 @@ The project is designed to run in a web browser and support both desktop and mob
 ## 📁 Project Structure
 
 ```text
-FIRE-AND-FURY-ARCADE/
+FIRE-AND-FURY-UNLEASHED/
 │
 ├── index.html
 ├── manifest.webmanifest.json
 ├── sw.js
-├── README.md
-│
-└── icons/
-    ├── icon-192.png
-    └── icon-512.png
+└── README.md
 ```
 
-The icons folder is optional until the actual icon files have been created and referenced in the manifest.
+Additional assets should remain in their existing project folders.
 
 ## 🚀 Run Locally
 
-1. Download or clone this repository.
-2. Open `index.html` in a browser.
-3. For service-worker and PWA functionality, run the project through a local web server or HTTPS hosting.
-4. Configure Firebase using the project's existing Firebase configuration.
+1. Clone or download this repository.
+2. Open the project using a local web server.
+3. Configure Firebase using the project's existing configuration.
+4. Open the application in a supported browser.
 
 ## 🌐 GitHub Pages Deployment
 
 1. Upload the project files to a GitHub repository.
-2. Open the repository's **Settings**.
-3. Select **Pages**.
-4. Choose **Deploy from a branch**.
-5. Select the branch containing the project, usually `main`.
-6. Select the root folder (`/`).
-7. Save and wait for deployment.
-
-GitHub Pages will provide a public website URL once deployment completes.
+2. Open **Settings → Pages**.
+3. Select **Deploy from a branch**.
+4. Choose the `main` branch.
+5. Select the root directory (`/`).
+6. Save and wait for deployment.
 
 ## 🔐 Firebase Configuration
 
-The project uses Firebase for authentication and data-related functionality.
+The project uses Firebase for account and data-related functionality.
 
-Make sure the Firebase project is configured correctly, including authorized domains and the required database security rules.
+Ensure that:
+- Firebase Authentication is configured.
+- Required database services are enabled.
+- GitHub Pages is included in Firebase authorized domains.
+- Database security rules are configured appropriately.
+- Private service-account credentials are never published.
 
-Never publish private service-account credentials or server-side secrets.
-
-## 📱 PWA Support
+## 📱 Progressive Web App
 
 The project includes a web app manifest and service worker for installation and basic offline caching.
 
-Full offline gameplay is not guaranteed if the game depends on external services or assets that are not cached.
+Some features may still require an internet connection, particularly those depending on Firebase or external assets.
 
-## 📜 Project Notes
+## 📜 Development Notes
 
-- Preserve the original game implementation when making updates.
-- Keep all required supporting files in the repository.
-- Do not remove existing gameplay features when modifying the code.
-- Test login, gameplay, scoring and multiplayer functionality after major updates.
+- Preserve the original 2D game implementation.
+- Retain existing Firebase functionality.
+- Preserve all existing game modes and player features.
+- Test major functionality after code updates.
 
 ---
 
-**FIRE AND FURY ARCADE**
+**FIRE AND FURY UNLEASHED**
 
 *Enter the battlefield. Make your mark.*
