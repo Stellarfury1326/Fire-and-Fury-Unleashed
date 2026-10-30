@@ -3883,7 +3883,7 @@ window.ffFirebase={auth:ffFirebaseAuth,
   throw new Error('Unsupported Firebase operation: '+name);
  }catch(error){return {data:null,error};}}
 };
-ffFirebase.storage={from:()=>({upload:async()=>({data:null,error:new Error('Firebase Storage is not enabled in this build; avatars are stored in Firestore.')}),remove:async()=>({data:null,error:null}),getPublicUrl:()=>({data:{publicUrl:''}})})};
+window.ffFirebase.storage={from:()=>({upload:async()=>({data:null,error:new Error('Firebase Storage is not enabled in this build; avatars are stored in Firestore.')}),remove:async()=>({data:null,error:null}),getPublicUrl:()=>({data:{publicUrl:''}})})};
 /* Keep legacy variable references pointed at the Firebase-backed bridge. */
 ffFirebase=window.ffFirebase;
 
@@ -4505,7 +4505,15 @@ document.querySelectorAll("#howModal .how-sec").forEach(e=>{
     for(var i=0;i<SETS.length;i++){
       try{
         for(const n of ["app","auth","firestore"]) await load(SETS[i][0]+n+SETS[i][1]);
-        if(window.firebase&&firebase.firestore){ ffStartBackend(); return; }
+        if(window.firebase&&firebase.firestore){
+          try{ ffStartBackend(); return; }
+          catch(startErr){
+            console.error("FIRE AND FURY backend failed to start:",startErr);
+            var st0=document.getElementById("authStatus");
+            if(st0) st0.textContent="⚠️ Online service failed to start: "+(startErr&&startErr.message||startErr);
+            return;
+          }
+        }
       }catch(e){}
     }
     console.warn("Firebase could not be loaded. Online features are unavailable.");
@@ -4548,4 +4556,4 @@ document.querySelectorAll("#howModal .how-sec").forEach(e=>{
 </body>
 </html>
 </body>
-</html><
+</html>
