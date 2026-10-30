@@ -3,7 +3,7 @@
    SDK scripts and any other cross-origin request are never cached here and need
    an internet connection. */
 const CACHE_PREFIX = 'fire-and-fury-';
-const CACHE_VERSION = 'v1';                       // bump on every deployment
+const CACHE_VERSION = 'v3';                       // bump on every deployment
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 
 const SHELL = [
