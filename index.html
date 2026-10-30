@@ -3090,6 +3090,7 @@ function multiplayerBackendReady(){
 async function ensureFirebaseClient(){
   if(!window.firebase || typeof window.firebase.auth !== "function" || typeof window.firebase.firestore !== "function")
     throw new Error("Firebase did not load. Check your internet connection and reload the page.");
+  if(!ffFirebase) throw new Error(window.ffBackendError || "The online service has not started yet. Wait a moment, then reload the page.");
   return window.firebase;
 }
 
@@ -3891,13 +3892,13 @@ const W=(n,f)=>{window[n]=f};
 const prof=uid=>db.collection("profiles").doc(uid);
 const wrap=u=>({id:u.uid,email:u.email,is_anonymous:false,user_metadata:{username:u.displayName||""}});
 const cn=s=>String(s||"").trim().replace(/\s+/g," ").slice(0,24);
-const err=e=>({"auth/invalid-credential":"Wrong email or password.","auth/email-already-in-use":"That email is already registered.","auth/weak-password":"Password is too weak.","auth/invalid-email":"That email address is not valid.","auth/too-many-requests":"Too many tries. Wait a minute and try again.","auth/requires-recent-login":"Please log out, log back in, then try again."}[e&&e.code]||(e&&e.message)||String(e));
+const err=e=>({"auth/invalid-credential":"Wrong email or password.","auth/email-already-in-use":"That email is already registered.","auth/weak-password":"Password is too weak.","auth/invalid-email":"That email address is not valid.","auth/too-many-requests":"Too many tries. Wait a minute and try again.","auth/requires-recent-login":"Please log out, log back in, then try again.","auth/operation-not-supported-in-this-environment":"Login is not available in this preview or sandbox. Open the game from its hosted https:// address (for example your GitHub Pages link) or from http://localhost in a normal browser tab with cookies/site data enabled."}[e&&e.code]||(e&&e.message)||String(e));
 let unsubReq=null, signingUp=false, lastScoreSend=0;
 const stopReq=()=>{if(unsubReq){unsubReq();unsubReq=null}};
 
 /* ---------- basics ---------- */
 W("multiplayerBackendReady",()=>!!window.firebase && !!window.firebase.firestore);
-W("ensureFirebaseClient",async()=>firebase);
+W("ensureFirebaseClient",async()=>{ if(!ffFirebase) throw new Error(window.ffBackendError || "The online service has not started yet. Wait a moment, then reload the page."); return firebase; });
 
 /* ---------- avatars (stored as small images inside Firestore) ---------- */
 W("isAvatarImage",v=>/^data:image\/(jpeg|webp|png);base64,/.test(String(v||""))&&String(v).length<60000);
@@ -4054,7 +4055,8 @@ W("signInWithGoogle",async()=>{
       "auth/unauthorized-domain":"This website domain must be added to Firebase Authentication → Settings → Authorized domains.",
       "auth/popup-closed-by-user":"Google sign-in was cancelled.",
       "auth/cancelled-popup-request":"A Google sign-in window is already open.",
-      "auth/network-request-failed":"Network error. Check your connection and try again."
+      "auth/network-request-failed":"Network error. Check your connection and try again.",
+      "auth/operation-not-supported-in-this-environment":"Login is not available in this preview or sandbox. Open the game from its hosted https:// address (for example your GitHub Pages link) or from http://localhost in a normal browser tab with cookies/site data enabled."
     };
     setAuthStatus("❌ "+(friendly[code]||err(e)));
   }
@@ -4193,6 +4195,7 @@ auth.getRedirectResult().then(async result=>{
     setAuthStatus("✅ Signed in with Google.");
   }
 }).catch(e=>{
+  if(e&&e.code==="auth/operation-not-supported-in-this-environment"){ console.info("Firebase Auth unavailable in this environment (preview/sandbox, file://, or blocked storage)."); setAuthStatus("⚠️ "+"Login is not available in this preview or sandbox. Open the game from its hosted https:// address (for example your GitHub Pages link) or from http://localhost in a normal browser tab with cookies/site data enabled."); return; }
   console.warn("FIRE & FURY Google redirect sign-in error",e);
   if(e&&e.code==="auth/unauthorized-domain") setAuthStatus("❌ Add this website domain to Firebase Authentication → Settings → Authorized domains.");
   else if(e&&e.code==="auth/operation-not-allowed") setAuthStatus("❌ Enable Google as a sign-in provider in Firebase Authentication.");
@@ -4509,8 +4512,9 @@ document.querySelectorAll("#howModal .how-sec").forEach(e=>{
           try{ ffStartBackend(); return; }
           catch(startErr){
             console.error("FIRE AND FURY backend failed to start:",startErr);
+            window.ffBackendError=(startErr&&startErr.code==="auth/operation-not-supported-in-this-environment")?"Login is not available in this preview or sandbox. Open the game from its hosted https:// address (for example your GitHub Pages link) or from http://localhost in a normal browser tab with cookies/site data enabled.":"Online service failed to start: "+(startErr&&startErr.message||startErr);
             var st0=document.getElementById("authStatus");
-            if(st0) st0.textContent="⚠️ Online service failed to start: "+(startErr&&startErr.message||startErr);
+            if(st0) st0.textContent="⚠️ "+window.ffBackendError;
             return;
           }
         }
@@ -4555,5 +4559,4 @@ document.querySelectorAll("#howModal .how-sec").forEach(e=>{
 
 </body>
 </html>
-</body>
 </html>
