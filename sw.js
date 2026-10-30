@@ -1,5 +1,10 @@
-
-const CACHE_NAME = 'fire-and-fury-pwa-v2';
+/* FIRE AND FURY — service worker.
+   Caches the local application shell only. Firebase (auth/database), the Firebase
+   SDK scripts and any other cross-origin request are never cached here and need
+   an internet connection. */
+const CACHE_PREFIX = 'fire-and-fury-';
+const CACHE_VERSION = 'v1';                       // bump on every deployment
+const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 
 const SHELL = [
   './',
@@ -9,87 +14,68 @@ const SHELL = [
   './icons/icon-512.png',
   './icons/icon-512-maskable.png'
 ];
+/* Optional audio: cached when present, but a missing file never blocks installation. */
+const OPTIONAL = [
+  './sounds/menu-bgm.mp3', './sounds/battle-bgm.mp3', './sounds/final-fury-bgm.mp3',
+  './sounds/rocket-launch.mp3', './sounds/explosion.mp3', './sounds/rock-destruction.mp3',
+  './sounds/victory.mp3', './sounds/defeat.mp3'
+];
 
-// INSTALL
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(SHELL))
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await cache.addAll(SHELL);
+    await Promise.all(OPTIONAL.map(u => cache.add(u).catch(() => {})));
+    await self.skipWaiting();
+  })());
 });
 
-// ACTIVATE
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys =>
-        Promise.all(
-          keys
-            .filter(key =>
-              key.startsWith('fire-and-fury-pwa-') &&
-              key !== CACHE_NAME
-            )
-            .map(key => caches.delete(key))
-        )
-      )
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const names = await caches.keys();
+    /* delete only OLD caches that belong to this app */
+    await Promise.all(names
+      .filter(n => n.startsWith(CACHE_PREFIX) && n !== CACHE_NAME)
+      .map(n => caches.delete(n)));
+    await self.clients.claim();
+  })());
 });
 
-// FETCH
 self.addEventListener('fetch', event => {
-  const request = event.request;
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;   // Firebase & CDNs: network only
 
-  // Only handle same-origin GET requests.
-  if (
-    request.method !== 'GET' ||
-    new URL(request.url).origin !== self.location.origin
-  ) {
+  /* page navigations: network first, fall back to cached shell when offline */
+  if (req.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(req);
+        const cache = await caches.open(CACHE_NAME);
+        if (fresh.ok) cache.put('./index.html', fresh.clone()).catch(() => {});
+        return fresh;
+      } catch (e) {
+        return (await caches.match('./index.html')) || (await caches.match('./')) ||
+               new Response('Offline', { status: 503, statusText: 'Offline' });
+      }
+    })());
     return;
   }
 
-  // PAGE NAVIGATION
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then(response => {
-          if (response.ok) {
-            const copy = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then(cache => cache.put('./index.html', copy));
-          }
-
-          return response;
-        })
-        .catch(async () => {
-          return (
-            await caches.match('./index.html') ||
-            Response.error()
-          );
-        })
-    );
-
-    return;
-  }
-
-  // OTHER SAME-ORIGIN RESOURCES
-  event.respondWith(
-    caches.match(request)
-      .then(async cached => {
-        if (cached) return cached;
-
-        const response = await fetch(request);
-
-        if (response.ok) {
-          const copy = response.clone();
-
-          caches.open(CACHE_NAME)
-            .then(cache => cache.put(request, copy));
-        }
-
-        return response;
-      })
-  );
+  /* static assets: cache first, then network (and remember it) */
+  event.respondWith((async () => {
+    const hit = await caches.match(req, { ignoreSearch: false });
+    if (hit) return hit;
+    try {
+      const res = await fetch(req);
+      if (res && res.ok && res.type === 'basic' && res.status === 200) {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(req, res.clone()).catch(() => {});
+      }
+      return res;
+    } catch (e) {
+      return new Response('', { status: 504, statusText: 'Offline' });
+    }
+  })());
 });
