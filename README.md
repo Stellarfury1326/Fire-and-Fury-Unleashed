@@ -1,254 +1,101 @@
-🔥 FIRE & FURY — Unleashed
+# 🔥 FIRE AND FURY ARCADE
 
-FIRE & FURY is a browser-based action game project built around the theme of power, fury, rockets, survival, and historical-inspired Mysorean warfare.
+A browser-based action arcade game inspired by the history and military innovations of the Kingdom of Mysore.
 
-Project file: Fire and fury unleashed.html
+## 🎮 About the Project
 
-🎮 Features
+FIRE AND FURY ARCADE is an interactive arcade experience featuring multiple game modes, player accounts, competitive scoring and customizable profiles.
 
-🔐 Account-based login and sign-up
+The project is designed to run in a web browser and support both desktop and mobile screens.
 
-👤 Player profile and custom avatar support
+## ⚔️ Game Modes
 
-🏆 Hall of Fame / leaderboard
+- **Rocket Battle** — An action-focused rocket battle experience.
+- **Volcano Rush** — A challenging volcano-themed game mode.
+- **Final Fury** — An intense final challenge.
 
-🎖️ Achievements and progression
+## ✨ Features
 
-📜 Gameplay history
+- Player registration and login using Firebase.
+- Player profiles and avatar customization.
+- Score tracking and gameplay history.
+- Hall of Fame and achievements.
+- Multiplayer features.
+- Responsive desktop and mobile interface.
+- Background music and sound effects.
+- Progressive Web App installation support.
+- Service worker for basic offline caching.
 
-🚀 Rocket Battle
+*Feature availability depends on the current implementation and backend configuration.*
 
-🌋 Volcano Rush
+## 🛠️ Technology
 
-🔥 Final Fury
+- HTML
+- CSS
+- JavaScript
+- Firebase Authentication
+- Firebase database services
+- Progressive Web App technologies
 
-🎵 Separate background music for menus, battles, and Final Fury
+## 📁 Project Structure
 
-💥 Rocket, explosion, rock-destruction, victory, and defeat sound effects
-
-✨ Gameplay visual effects
-
-📱 Mobile-friendly controls and responsive UI
-
-🖥️ PC keyboard controls
-
-🌐 Supabase-powered online scores and multiplayer infrastructure
-
-🕹️ Game Modes
-
-🚀 Rocket Battle
-
-Fight British forces using Mysorean rockets and complete battlefield objectives.
-
-🌋 Volcano Rush
-
-Survive a volcanic environment while dealing with hazards and completing objectives.
-
-🔥 Final Fury
-
-A high-intensity mode combining combat and environmental hazards.
-
-🔊 Audio
-
-The game expects these local audio files:
-
-sounds/
-├── menu-bgm.mp3
-├── battle-bgm.mp3
-├── final-fury-bgm.mp3
-├── rocket-launch.mp3
-├── explosion.mp3
-├── rock-destruction.mp3
-├── victory.mp3
-└── defeat.mp3
-
-BGM routing
-
-Area
-
-Track
-
-Home / menus / profile
-
-menu-bgm.mp3
-
-Rocket Battle
-
-battle-bgm.mp3
-
-Volcano Rush
-
-battle-bgm.mp3
-
-Final Fury
-
-final-fury-bgm.mp3
-
-Results screen
-
-BGM stops
-
-The game is designed so that only one background-music track is active at a time.
-
-👤 Accounts & Online Features
-
-FIRE & FURY uses Supabase for authenticated player accounts and online game data.
-
-The browser build uses a publishable Supabase key. A service-role/secret key must never be placed in the HTML.
-
-The project can use these online data areas:
-
-profiles
-
-scores
-
-matches
-
-match_players
-
-match_requests
-
-Custom avatars use a Supabase Storage bucket named:
-
-avatars
-
-Supported avatar formats:
-
-PNG
-
-JPEG
-
-WebP
-
-The configured upload limit is 1 MB.
-
-📁 GitHub Setup
-
-Keep the project structure like this:
-
-Fire-and-Fury/
+```text
+FIRE-AND-FURY-ARCADE/
 │
-├── Fire and fury unleashed.html
-├── logo.png
+├── index.html
+├── manifest.webmanifest.json
+├── sw.js
+├── README.md
 │
-└── sounds/
-    ├── menu-bgm.mp3
-    ├── battle-bgm.mp3
-    ├── final-fury-bgm.mp3
-    ├── rocket-launch.mp3
-    ├── explosion.mp3
-    ├── rock-destruction.mp3
-    ├── victory.mp3
-    └── defeat.mp3
+└── icons/
+    ├── icon-192.png
+    └── icon-512.png
+```
 
-Important: the HTML references the files inside sounds/. Do not rename or move those files unless you also update the paths inside the HTML.
+The icons folder is optional until the actual icon files have been created and referenced in the manifest.
 
-▶️ Running the Game
+## 🚀 Run Locally
 
-Because this is a browser project, the simplest approach is to publish the repository with GitHub Pages or another static web host.
+1. Download or clone this repository.
+2. Open `index.html` in a browser.
+3. For service-worker and PWA functionality, run the project through a local web server or HTTPS hosting.
+4. Configure Firebase using the project's existing Firebase configuration.
 
-GitHub Pages
+## 🌐 GitHub Pages Deployment
 
-Create a GitHub repository.
+1. Upload the project files to a GitHub repository.
+2. Open the repository's **Settings**.
+3. Select **Pages**.
+4. Choose **Deploy from a branch**.
+5. Select the branch containing the project, usually `main`.
+6. Select the root folder (`/`).
+7. Save and wait for deployment.
 
-Upload:
+GitHub Pages will provide a public website URL once deployment completes.
 
-Fire and fury unleashed.html
+## 🔐 Firebase Configuration
 
-logo.png
+The project uses Firebase for authentication and data-related functionality.
 
-the complete sounds/ folder
+Make sure the Firebase project is configured correctly, including authorized domains and the required database security rules.
 
-this README.md
+Never publish private service-account credentials or server-side secrets.
 
-Enable GitHub Pages in the repository settings.
+## 📱 PWA Support
 
-Open the published site.
+The project includes a web app manifest and service worker for installation and basic offline caching.
 
-For local development, a simple static HTTP server is preferable to opening the HTML directly with file://, especially for online services and browser security restrictions.
+Full offline gameplay is not guaranteed if the game depends on external services or assets that are not cached.
 
-🎯 Controls
+## 📜 Project Notes
 
-PC
+- Preserve the original game implementation when making updates.
+- Keep all required supporting files in the repository.
+- Do not remove existing gameplay features when modifying the code.
+- Test login, gameplay, scoring and multiplayer functionality after major updates.
 
-Use the on-screen controls where available, together with the game's keyboard controls.
+---
 
-Typical movement/combat controls include:
+**FIRE AND FURY ARCADE**
 
-W / A / S / D — movement
-
-Arrow keys — movement where supported
-
-Space — fire where supported
-
-Mouse/touch controls — depending on the active game interface
-
-Mobile
-
-The game provides touch-friendly controls for supported gameplay screens.
-
-🏆 Progression
-
-The achievement system includes early milestones such as:
-
-🌱 First Spark — complete your first game
-
-🎮 Regular Player — complete 5 games
-
-🔥 Score Chaser — reach 1,000 points in one game
-
-💎 High Scorer — reach 5,000 points in one game
-
-🌟 Point Collector — earn 10,000 total points
-
-More difficult achievement tiers can be added as the project evolves.
-
-🧑‍💻 Technology
-
-FIRE & FURY is primarily a client-side browser project using:
-
-HTML
-
-CSS
-
-JavaScript
-
-Canvas/game UI systems
-
-Supabase JavaScript client
-
-Supabase Authentication
-
-Supabase Database
-
-Supabase Storage
-
-Web Audio / HTML5 audio
-
-⚠️ Current Build Notes
-
-This repository contains the current Fire and fury unleashed.html browser build and its supporting assets.
-
-The project is actively developed. Some advanced systems—especially the long-term goal of a fully realized 3D battlefield experience—may continue to evolve.
-
-Do not describe a feature as production-secure merely because the UI exists. Online authentication, multiplayer, account deletion, database policies, and storage policies should be verified in the actual Supabase project before treating them as production-ready.
-
-🔒 Security Notes
-
-Never commit a Supabase service_role key.
-
-Never put database admin credentials in client-side JavaScript.
-
-Use Row Level Security (RLS) for protected database data.
-
-Validate permissions server-side through Supabase policies/RPCs.
-
-Treat all browser-side game values as untrusted input.
-
-📜 Credits
-
-FIRE & FURY
-
-A student game project focused on combining historical inspiration with fast-paced arcade combat, rockets, survival, and dramatic visual presentation.
-
-🔥 Feel the fury. Launch the rocket. Take the battlefield.
+*Enter the battlefield. Make your mark.*
