@@ -1,18 +1,29 @@
 {
-  "name": "FIRE AND FURY",
-  "short_name": "Fire & Fury",
-  "description": "A fast-paced 2D historical arcade action game featuring the V-2 missile.",
-  "id": "./",
-  "start_url": "./",
-  "scope": "./",
-  "display": "standalone",
-  "orientation": "any",
-  "background_color": "#0b0403",
-  "theme_color": "#160b08",
-  "categories": ["games"],
-  "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ]
+"name": "FIRE AND FURY",
+"short_name": "FIRE & FURY",
+"start_url": "./",
+"scope": "./",
+"display": "standalone",
+"background_color": "#120605",
+"theme_color": "#160b08",
+"icons": [
+{
+"src": "./icons/icon-192.png",
+"sizes": "192x192",
+"type": "image/png",
+"purpose": "any"
+},
+{
+"src": "./icons/icon-512.png",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "any"
+},
+{
+"src": "./icons/icon-512-maskable.png",
+"sizes": "512x512",
+"type": "image/png",
+"purpose": "maskable"
+}
+]
 }
