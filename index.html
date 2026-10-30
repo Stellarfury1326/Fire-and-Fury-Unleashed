@@ -2139,6 +2139,12 @@ if (moveLeft && !moveRight) {
 player.x = Math.max(
   30,
   Math.min(GAME_W - 30, player.x)
+  /* FIRE — Space / FIRE button shoots the V-2 (Rocket Battle and Final Fury) */
+fireCooldown = Math.max(0, fireCooldown - dt);
+if(keys.fire && gameType !== "volcano" && fireCooldown <= 0){
+  fire();
+  fireCooldown = 0.22;
+}
 );
 
 /* SPAWN */
