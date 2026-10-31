@@ -1,0 +1,4130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FIRE AND FURY UNLEASHED | Arcade Exhibition</title>
+<meta name="theme-color" content="#160b08">
+
+<style>
+/* =====================================================
+   FIRE AND FURY UNLEASHED — single, consolidated stylesheet
+   (no duplicated/overriding "patch" blocks)
+===================================================== */
+
+/* ---------- BASE ---------- */
+*,*::before,*::after{box-sizing:border-box}
+
+html{-webkit-text-size-adjust:100%}
+
+html,body{
+    margin:0;
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+}
+
+body{
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    flex-direction:column;
+    font-family:Georgia,"Times New Roman",serif;
+    color:#f3dcc0;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(255,140,50,.22), transparent 45%),
+        linear-gradient(180deg,#1f0d08 0%,#120605 55%,#0b0403 100%);
+    background-attachment:fixed;
+}
+
+/* while a game is on screen the page is exactly one viewport tall */
+body.in-game{
+    height:100vh;
+    height:100dvh;
+    overflow:hidden;
+}
+
+img,canvas,svg{max-width:100%}
+
+button{font:inherit;cursor:pointer}
+button,input,select{max-width:100%}
+
+button:focus-visible,
+input:focus-visible{
+    outline:3px solid #ffe49a;
+    outline-offset:3px;
+}
+
+[hidden]{display:none !important}
+.hidden{display:none !important}
+
+/* ---------- TOP BAR (header + sound bar stick together) ---------- */
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:100;
+    flex:0 0 auto;
+}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+    padding:10px 20px;
+    background:rgba(22,9,6,.95);
+    border-bottom:1px solid #743717;
+    backdrop-filter:blur(10px);
+}
+
+.logo img{
+    height:45px;
+    width:auto;
+    display:block;
+}
+
+.score-pill{
+    max-width:100%;
+    background:#2a120c;
+    border:1px solid #8c451c;
+    border-radius:30px;
+    padding:8px 14px;
+    color:#ffd987;
+}
+
+.sound-bar{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    padding:6px 10px;
+    background:rgba(10,7,5,.95);
+    border-bottom:1px solid #5d2b16;
+    backdrop-filter:blur(8px);
+}
+
+.sound-bar .btn{margin:0;padding:6px 12px}
+
+.sound-bar label{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    color:#f5d7bd;
+    font-size:.9rem;
+}
+
+/* ---------- START SCREEN ---------- */
+.start-screen{
+    position:fixed;
+    inset:0;
+    z-index:2000;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:clamp(12px,3vh,28px);
+    overflow-y:auto;
+    text-align:center;
+    background:radial-gradient(circle at 50% 35%, #6a2a12, #1a0a06 60%, #080303);
+}
+
+.start-card{
+    width:min(100%,720px);
+    margin:auto;
+    padding:42px 28px;
+    border:1px solid #c06a28;
+    border-radius:24px;
+    background:rgba(22,9,6,.92);
+    box-shadow:0 0 80px #000, 0 0 40px #ff5a1830;
+}
+
+.start-title{
+    margin:0 0 8px;
+    color:#ffd16b;
+    font-size:clamp(36px,9vw,64px);
+    font-weight:900;
+    letter-spacing:3px;
+    text-shadow:0 4px 20px #000, 0 0 30px #ff641c;
+}
+
+.start-sub{
+    color:#e8c9a0;
+    font-size:clamp(16px,3.5vw,20px);
+    margin:0 0 6px;
+}
+
+.start-desc{
+    color:#d4a87a;
+    font-size:18px;
+    margin:12px 0 24px;
+}
+
+.start-actions{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+}
+
+.start-note{
+    margin:18px 0 0;
+    color:#c9a88a;
+    font-size:14px;
+    line-height:1.5;
+}
+
+/* ---------- SCREENS / LAYOUT ---------- */
+.screen{
+    display:none;
+    width:100%;
+    flex:1 0 auto;
+}
+
+.screen.active{display:block}
+
+.wrap{
+    width:min(1100px,100%);
+    margin-inline:auto;
+    padding:clamp(10px,2vw,22px) clamp(10px,3vw,28px) 22px;
+}
+
+.section-title{
+    text-align:center;
+    color:#ffd16b;
+    font-size:clamp(26px,7vw,38px);
+    text-shadow:0 2px 8px #000;
+}
+
+.subtitle{
+    display:block;
+    max-width:850px;
+    margin:4px auto 8px;
+    padding:0 14px;
+    text-align:center;
+    line-height:1.5;
+    color:#f3d4ad;
+    font-size:clamp(13px,2vw,17px);
+    text-wrap:balance;
+}
+
+/* ---------- HOME / HERO ---------- */
+.hero{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    width:100%;
+}
+
+.main-logo{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    margin:4px auto 6px;
+}
+
+.main-logo img{
+    width:min(390px,66vw);
+    max-height:12dvh;
+    object-fit:contain;
+    filter:drop-shadow(0 8px 20px rgba(0,0,0,.7)) drop-shadow(0 0 16px rgba(255,112,25,.22));
+}
+
+.main-logo-text{
+    margin-top:6px;
+    font-size:clamp(24px,5vw,42px);
+    font-weight:900;
+    letter-spacing:5px;
+    color:#ffd16b;
+    animation:titleGlow 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow{
+    from{text-shadow:0 3px 8px #000,0 0 12px #ff641c}
+    to{text-shadow:0 3px 8px #000,0 0 25px #ff8b2c,0 0 38px #b82d0a}
+}
+
+.hero-art{
+    display:block;
+    width:min(680px,92vw);
+    max-height:23dvh;
+    height:auto;
+    margin:0 auto 4px;
+    overflow:visible;
+    filter:drop-shadow(0 14px 24px #0009);
+}
+
+.hero-art .lava-flow{animation:lavaPulse 2.8s ease-in-out infinite alternate}
+.hero-art .rocket-flame{
+    animation:flameFlicker .22s ease-in-out infinite alternate;
+    transform-box:fill-box;
+    transform-origin:100% 50%;
+}
+.hero-art .ember{animation:emberDrift 3.5s ease-in-out infinite alternate}
+
+@keyframes lavaPulse{from{opacity:.72}to{opacity:1}}
+@keyframes flameFlicker{from{transform:scaleX(.8)}to{transform:scaleX(1.15)}}
+@keyframes emberDrift{
+    from{transform:translateY(5px);opacity:.45}
+    to{transform:translateY(-9px);opacity:1}
+}
+
+.main-play{
+    width:100%;
+    margin:8px auto 10px;
+    text-align:center;
+}
+
+.main-play p{
+    color:#d8bda8;
+    margin:10px 0 0;
+    font-size:16px;
+}
+
+.home-tools{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:12px;
+}
+
+.play-button{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:clamp(22px,5vw,36px);
+    font-weight:bold;
+    max-width:100%;
+    padding:16px 48px;
+    color:#1a0803;
+    background:linear-gradient(135deg,#ffd86b,#ff8a20);
+    border:3px solid #ffe7a3;
+    border-radius:18px;
+    box-shadow:0 0 20px #ff6a1c, 0 8px 25px #000;
+    transition:transform .2s, box-shadow .2s;
+}
+
+.play-button:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 35px #ff7b20, 0 12px 30px #000;
+}
+
+.play-button:active{transform:scale(.96)}
+
+.notice{
+    width:100%;
+    max-width:850px;
+    min-width:0;
+    margin:8px auto;
+    padding:12px;
+    text-align:center;
+    background:#24120d;
+    border:1px solid #74421f;
+    border-radius:14px;
+    color:#e9d4bf;
+    line-height:1.5;
+    overflow-wrap:anywhere;
+}
+
+.grid{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));
+    gap:14px;
+}
+
+.card{
+    min-width:0;
+    padding:20px;
+    text-align:center;
+    background:linear-gradient(180deg,#2a130d,#170907);
+    border:1px solid #75401f;
+    border-radius:18px;
+    box-shadow:0 12px 30px #0009;
+    overflow-wrap:anywhere;
+    transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+
+.card:hover{
+    transform:translateY(-4px);
+    border-color:#c87531;
+    box-shadow:0 16px 32px #000a,0 0 18px #ff6a1c20;
+}
+
+.card .emoji{font-size:54px;line-height:1.1}
+
+.card h3{
+    color:#ffc65f;
+    font-size:24px;
+    margin:12px 0 8px;
+}
+
+.card p{
+    color:#d8c1ad;
+    line-height:1.5;
+}
+
+footer{
+    text-align:center;
+    color:#b99a85;
+    padding:26px 14px;
+    line-height:1.5;
+}
+
+/* ---------- BUTTONS ---------- */
+.btn{
+    margin:5px;
+    padding:11px 18px;
+    color:#f4d3a5;
+    background:#2a120c;
+    border:1px solid #8e481d;
+    border-radius:12px;
+    box-shadow:0 4px 12px #0008;
+    transition:transform .15s, background .15s;
+}
+
+.btn:hover{
+    transform:translateY(-2px);
+    background:#421a0d;
+}
+
+.btn:active{transform:scale(.96)}
+
+.btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.btn.gold{
+    color:#1b0803;
+    background:linear-gradient(135deg,#ffd86b,#ff8a20);
+    border-color:#ffe7a3;
+    font-weight:bold;
+}
+
+.btn.danger{
+    border-color:#b0361f;
+    color:#ffb5ad;
+}
+
+/* ---------- HISTORY ---------- */
+.timeline{
+    border-left:3px solid #a9541e;
+    padding-left:25px;
+    margin:25px 0;
+}
+
+.event{
+    margin-bottom:20px;
+    padding:15px;
+    background:#21100b;
+    border:1px solid #62351e;
+    border-radius:12px;
+    line-height:1.6;
+}
+
+.event strong{color:#ffc45d}
+
+.history-table{
+    width:100%;
+    border-collapse:collapse;
+    text-align:left;
+}
+
+.history-table th,
+.history-table td{
+    padding:6px 8px;
+    border-bottom:1px solid rgba(255,190,90,.2);
+}
+
+/* ---------- RESULTS ---------- */
+.result{
+    text-align:center;
+    max-width:750px;
+    margin:auto;
+}
+
+.result-trophy{font-size:64px;line-height:1.1}
+
+.bigscore{
+    font-size:clamp(56px,16vw,80px);
+    color:#ffd05d;
+    text-shadow:0 0 25px #ff701d;
+}
+
+.statgrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+    gap:12px;
+    margin:20px 0;
+}
+
+.stat{
+    padding:16px;
+    background:#24110c;
+    border:1px solid #6e3a1b;
+    border-radius:12px;
+}
+
+.stat b{
+    display:block;
+    font-size:30px;
+    color:#ffc35b;
+    margin-top:5px;
+}
+
+/* ---------- GAME SCREEN ---------- */
+#game.screen.active{
+    display:flex;
+    flex-direction:column;
+    flex:1 1 0;
+    min-height:0;
+    overflow:hidden;
+}
+
+.game-wrap{
+    position:relative;
+    width:min(1100px,100%);
+    flex:1 1 0;
+    min-height:0;
+    margin:0 auto;
+    padding:6px 10px 8px;
+    display:flex;
+    flex-direction:column;
+    background:#120806;
+    border:1px solid #633016;
+    border-radius:20px;
+    box-shadow:0 12px 32px rgba(0,0,0,.55),0 0 20px rgba(255,92,20,.12);
+}
+
+.game-head{
+    flex:0 0 auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:6px;
+}
+
+.game-stat{
+    padding:5px 9px;
+    font-size:clamp(11px,2.4vw,15px);
+    line-height:1.15;
+    color:#fff3c7;
+    background:rgba(36,16,10,.95);
+    border:1px solid #a4531e;
+    border-radius:10px;
+    text-shadow:0 1px 2px #000, 0 0 6px rgba(255,180,70,.35);
+}
+
+.game-stat span{color:#fff}
+
+#mpBattleBar{
+    display:none;
+    flex:0 0 auto;
+    margin-bottom:4px;
+    padding:4px 10px;
+    text-align:center;
+    font-size:.85rem;
+    color:#fff;
+    background:rgba(64,19,9,.85);
+    border:1px solid #ff9b32;
+    border-radius:10px;
+    text-shadow:0 2px 3px #000;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+#mpBattleBar.show{display:block}
+
+/* The stage keeps the 16:10 canvas fully visible at any window size.
+   The HUD, combo banner and fury panel are overlays on the canvas itself,
+   so showing/hiding them never changes the layout. */
+.stage{
+    position:relative;
+    flex:1 1 0;
+    min-height:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    container-type:size;
+}
+
+.stage-inner{
+    position:relative;
+    width:min(100cqw,160cqh);
+    aspect-ratio:16 / 10;
+}
+
+@supports not (width:1cqw){
+    .stage{container-type:normal}
+    .stage-inner{width:100%}
+}
+
+#gameCanvas{
+    display:block;
+    width:100%;
+    height:100%;
+    background:#24120c;
+    border:2px solid #a94f1c;
+    border-radius:16px;
+    box-shadow:0 0 24px rgba(255,92,20,.26),0 10px 24px rgba(0,0,0,.65);
+    animation:lavaFrame 4s ease-in-out infinite;
+    touch-action:none;
+}
+
+@keyframes lavaFrame{
+    0%,100%{box-shadow:0 0 20px rgba(255,150,45,.28),0 0 25px rgba(70,35,10,.18)}
+    50%{box-shadow:0 0 34px rgba(255,150,45,.48),0 0 32px rgba(70,35,10,.22)}
+}
+
+#gameCanvas.fury-aura{
+    filter:drop-shadow(0 0 9px #ff671d);
+    animation:furyCanvasPulse .65s ease-in-out infinite alternate;
+}
+
+@keyframes furyCanvasPulse{to{filter:drop-shadow(0 0 19px #ff8b24)}}
+
+/* hit flash is declared after .fury-aura so it wins when both apply */
+#gameCanvas.hit{animation:hitFlash .18s linear 2}
+
+@keyframes hitFlash{
+    0%{filter:brightness(1)}
+    50%{filter:brightness(2) saturate(1.5)}
+    100%{filter:brightness(1)}
+}
+
+/* ---- combo banner + fury panel (overlays) ---- */
+.combo-banner{
+    display:none;
+    position:absolute;
+    top:10px;
+    left:0;
+    right:0;
+    z-index:15;
+    width:fit-content;
+    max-width:92%;
+    margin:0 auto;
+    padding:8px 16px;
+    text-align:center;
+    font-size:clamp(12px,2.6vw,17px);
+    font-weight:900;
+    letter-spacing:1.5px;
+    color:#fff7d6;
+    background:linear-gradient(90deg,#401309,#8e2b0c,#401309);
+    border:1px solid #ff9b32;
+    border-radius:14px;
+    text-shadow:0 2px 4px #000,0 0 14px #ff6a00;
+    box-shadow:0 0 22px #ff5b1855;
+    pointer-events:none;
+}
+
+.combo-banner.show{
+    display:block;
+    animation:comboPop 2.25s cubic-bezier(.2,1.5,.4,1) both;
+}
+
+.combo-banner.break{
+    border-color:#a8a8a8;
+    background:linear-gradient(90deg,#292929,#555,#292929);
+    color:#eee;
+    text-shadow:0 2px 3px #000;
+}
+
+.combo-banner.break.show{animation:comboBreakHold 1.9s ease-out both}
+
+@keyframes comboPop{
+    0%{opacity:0;transform:translateY(12px) scale(.55)}
+    12%{opacity:1;transform:translateY(-3px) scale(1.12)}
+    22%{transform:translateY(0) scale(1)}
+    78%{opacity:1;transform:translateY(0) scale(1)}
+    100%{opacity:0;transform:translateY(-12px) scale(.96)}
+}
+
+@keyframes comboBreakHold{
+    0%{opacity:0;transform:scale(.88)}
+    12%{opacity:1;transform:scale(1.04)}
+    22%,82%{opacity:1;transform:scale(1)}
+    100%{opacity:0;transform:translateY(-8px) scale(.98)}
+}
+
+.fury-mode-panel{
+    display:none;
+    position:absolute;
+    top:10px;
+    right:10px;
+    z-index:15;
+    width:min(190px,42%);
+    padding:6px 10px;
+    text-align:center;
+    font-size:clamp(10px,2vw,13px);
+    font-weight:900;
+    letter-spacing:.5px;
+    color:#fff1c7;
+    background:linear-gradient(90deg,#260a05,#6b1d08);
+    border:1px solid #ff6b19;
+    border-radius:12px;
+    text-shadow:0 1px 2px #000;
+    box-shadow:0 0 18px #ff5b1866;
+    pointer-events:none;
+}
+
+.fury-mode-panel.active{
+    display:block;
+    animation:furyPanelPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes furyPanelPulse{to{box-shadow:0 0 28px #ff7a22aa}}
+
+.fury-meter{
+    height:6px;
+    margin-top:6px;
+    background:#452015;
+    border-radius:8px;
+    overflow:hidden;
+}
+
+.fury-meter-fill{
+    height:100%;
+    width:100%;
+    background:linear-gradient(90deg,#ffb21c,#ff4c08);
+    transition:width .15s linear;
+}
+
+.combo-stat-hot{animation:comboPulse .45s ease-out}
+
+@keyframes comboPulse{
+    0%{transform:scale(1);box-shadow:0 0 0 #ff6b00}
+    45%{transform:scale(1.16);box-shadow:0 0 20px #ff6b00}
+    100%{transform:scale(1)}
+}
+
+/* ---- on-canvas touch HUD ---- */
+.controls{
+    position:absolute;
+    inset:0;
+    z-index:20;
+    pointer-events:none;
+    touch-action:none;
+}
+
+.hud-fire,
+.hud-joystick{
+    position:absolute;
+    bottom:10px;
+    pointer-events:auto;
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    color:#fff4d0;
+    text-shadow:0 2px 3px #000;
+}
+
+.hud-fire{
+    left:10px;
+    width:clamp(64px,14vw,112px);
+    height:clamp(64px,14vw,112px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:1px;
+    font-size:clamp(26px,5vw,38px);
+    font-weight:900;
+    border-radius:50%;
+    border:2px solid rgba(255,185,95,.65);
+    background:linear-gradient(145deg,#5a1c0c,#24100a);
+    box-shadow:0 6px 20px rgba(0,0,0,.5),inset 0 0 18px rgba(255,100,30,.12);
+}
+
+.hud-fire span{
+    font-size:11px;
+    letter-spacing:1.5px;
+    color:#fff4d0;
+}
+
+.hud-fire:active{
+    transform:scale(.94);
+    background:radial-gradient(circle,rgba(255,125,30,.55),rgba(55,12,5,.7));
+}
+
+.hud-joystick{
+    right:10px;
+    width:clamp(100px,22vw,156px);
+    height:clamp(66px,13vw,100px);
+    border-radius:999px;
+    border:2px solid rgba(255,185,95,.42);
+    background:#24100a;
+    box-shadow:0 4px 20px rgba(0,0,0,.45),inset 0 0 20px rgba(255,100,30,.08);
+    overflow:hidden;
+}
+
+.hud-joystick-track{
+    position:absolute;
+    inset:8px;
+    border-radius:999px;
+    background:linear-gradient(90deg,#35150b,#4a210f,#35150b);
+}
+
+.hud-joystick-thumb{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:clamp(44px,9vw,64px);
+    height:clamp(44px,9vw,64px);
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    border:2px solid rgba(255,215,150,.68);
+    background:radial-gradient(circle at 35% 30%,#d18a3d,#71300f);
+    box-shadow:0 3px 12px rgba(0,0,0,.45);
+    transition:transform .06s linear;
+}
+
+.hud-joystick .joy-left,
+.hud-joystick .joy-right{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:15px;
+    color:rgba(255,225,175,.8);
+    pointer-events:none;
+}
+
+.hud-joystick .joy-left{left:10px}
+.hud-joystick .joy-right{right:10px}
+
+/* keyboard users on desktop: make the touch HUD less prominent */
+@media (hover:hover) and (pointer:fine){
+    .hud-fire,.hud-joystick{opacity:.7}
+}
+
+.game-message{
+    flex:0 0 auto;
+    min-height:18px;
+    margin:4px 0 0;
+    text-align:center;
+    font-size:.9rem;
+    font-weight:800;
+    color:#fff3d6;
+    text-shadow:0 2px 3px #000,0 0 8px rgba(0,0,0,.85);
+}
+
+.game-actions{
+    flex:0 0 auto;
+    text-align:center;
+}
+
+.game-actions .btn{color:#fff1d0;text-shadow:0 1px 2px #000}
+
+/* ---------- AVATARS / PROFILE / HALL OF FAME ---------- */
+.ff-avatar-box{
+    margin-top:12px;
+    padding:14px;
+    border:1px solid rgba(255,190,90,.25);
+    border-radius:14px;
+    background:rgba(30,12,7,.65);
+}
+
+.ff-avatar-img{
+    display:block;
+    object-fit:cover;
+    border-radius:50%;
+    border:2px solid rgba(255,211,107,.35);
+    background:#160c08;
+}
+
+.ff-avatar-fallback{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    background:#160c08;
+    border:2px solid rgba(255,211,107,.35);
+    line-height:1;
+    overflow:hidden;
+}
+
+.ff-avatar-inline{
+    display:inline-flex;
+    vertical-align:middle;
+    align-items:center;
+}
+
+.ff-profile-identity{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:14px;
+    margin:10px 0 14px;
+    border:1px solid rgba(255,190,90,.25);
+    border-radius:14px;
+    background:rgba(30,12,7,.65);
+    text-align:left;
+}
+
+.ff-profile-avatar{flex:0 0 96px;width:96px;height:96px}
+.ff-profile-username{font-size:1.55rem;font-weight:800}
+.ff-profile-sub{opacity:.78;margin-top:4px}
+
+.hof-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+    gap:6px;
+}
+
+.hof-player{
+    min-width:0;
+    padding:7px;
+    text-align:center;
+    border:1px solid rgba(255,180,90,.35);
+    border-radius:10px;
+    background:rgba(30,10,5,.72);
+}
+
+.hof-avatar{
+    width:52px;
+    height:52px;
+    margin:0 auto 4px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.hof-player .hof-name{
+    font-weight:800;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.hof-player .hof-meta{font-size:.78em;color:#e8c9b5}
+
+/* ---------- MODALS ---------- */
+.ff-modal{
+    position:fixed;
+    inset:0;
+    z-index:5000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:12px;
+    background:rgba(0,0,0,.78);
+}
+
+.ff-modal.show{display:flex}
+
+.ff-modal-card{
+    width:min(640px,96vw);
+    max-height:92dvh;
+    overflow:auto;
+    padding:16px;
+    border:2px solid #a84d1b;
+    border-radius:18px;
+    background:linear-gradient(180deg,#25100a,#0b0403);
+    box-shadow:0 0 60px #000,0 0 30px #ff5a1828;
+}
+
+.ff-modal-card.narrow{width:min(520px,96vw)}
+
+.ff-modal-card h2{margin:0 0 8px;color:#ffd16b}
+
+.ff-row{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin:8px 0;
+}
+
+.ff-row input{flex:1;min-width:180px}
+
+.ff-label{display:block;margin:10px 0 5px}
+
+.ff-field,
+.ff-row input{
+    padding:12px;
+    font-size:16px;              /* 16px stops iOS zooming into the field */
+    color:#fff;
+    background:#160c08;
+    border:1px solid #71401f;
+    border-radius:10px;
+}
+
+.ff-field{display:block;width:100%}
+
+.ff-status{
+    padding:9px;
+    border-radius:10px;
+    background:rgba(255,255,255,.06);
+    font-size:.9em;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:700px){
+    header{padding:8px 12px}
+    .score-pill{font-size:.85rem;padding:6px 10px}
+    .sound-bar{padding:4px 8px}
+    .wrap{padding-left:8px;padding-right:8px}
+    .card{padding:14px}
+    .play-button{padding:14px 24px}
+    .timeline{padding-left:14px}
+    .game-wrap{padding:4px 5px 6px;border-radius:14px}
+    .game-head{gap:3px;margin-bottom:4px}
+    .game-stat{padding:4px 6px}
+    .hud-fire{left:6px;bottom:6px}
+    .hud-joystick{right:6px;bottom:6px}
+}
+
+@media(max-height:700px){
+    .main-logo img{max-height:9dvh}
+    .hero-art{max-height:16dvh}
+    .notice{font-size:.85em;padding:8px}
+    .play-button{padding:11px 22px;font-size:clamp(20px,4vw,30px)}
+}
+
+@media(max-height:600px){
+    .combo-banner,.fury-mode-panel{font-size:11px;padding:4px 8px}
+    .game-message{display:none}
+    .game-stat{font-size:11px;padding:3px 6px}
+}
+
+@media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{
+        animation-duration:.01ms !important;
+        animation-iteration-count:1 !important;
+        scroll-behavior:auto !important;
+        transition-duration:.01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen" class="start-screen">
+    <div class="start-card">
+        <div class="start-title">FIRE AND FURY UNLEASHED</div>
+        <p class="start-sub">History &amp; Geography enter Arcade Mode</p>
+        <p class="start-desc">🌋 Volcanoes • 🚀 V-2 Missile</p>
+        <div class="start-actions">
+            <button class="play-button" type="button" onclick="openAuthGate()">🔐 LOGIN / SIGN UP</button>
+            <button class="btn" type="button" onclick="dismissStartScreen()">👀 EXPLORE THE EXHIBITION</button>
+        </div>
+        <p class="start-note">
+            Explore the exhibition freely. A registered FIRE AND FURY UNLEASHED account is required to play missions.
+        </p>
+    </div>
+</div>
+
+<div class="topbar">
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="FIRE AND FURY UNLEASHED Logo">
+        </div>
+        <div class="score-pill">
+            🏆 <span id="headerScore">0</span> total pts · <span id="headerMatches">0</span> matches
+        </div>
+    </header>
+
+    <div id="soundBar" class="sound-bar">
+        <button class="btn" id="soundToggle" type="button" onclick="toggleSound()">🔊 SOUND ON</button>
+        <label for="soundVolume">VOL
+            <input id="soundVolume" type="range" min="0" max="1" step="0.05" value="0.75" oninput="setMasterVolume(this.value)" aria-label="Volume">
+        </label>
+    </div>
+</div>
+
+<!-- HOME -->
+<section id="home" class="screen active">
+<div class="wrap">
+<div class="hero">
+
+    <div class="main-logo">
+        <img src="logo.png" alt="FIRE AND FURY UNLEASHED">
+        <div class="main-logo-text">FIRE AND FURY UNLEASHED</div>
+    </div>
+
+    <svg class="hero-art" viewBox="0 0 760 300" role="img" aria-label="Illustration of a glowing volcano and a V-2 missile flying across a night sky" xmlns="http://www.w3.org/2000/svg">
+     <defs>
+      <linearGradient id="skyGlow" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4a1a12"/><stop offset="1" stop-color="#160806"/></linearGradient>
+      <linearGradient id="mountain" x1="0" y1="0" x2="0.7" y2="1"><stop stop-color="#6b3020"/><stop offset="1" stop-color="#1c0b09"/></linearGradient>
+      <linearGradient id="magma" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe27a"/><stop offset=".45" stop-color="#ff7824"/><stop offset="1" stop-color="#b51e0b"/></linearGradient>
+     </defs>
+     <ellipse cx="380" cy="265" rx="330" ry="24" fill="#f45a16" opacity=".13"/>
+     <path d="M35 253 Q115 205 185 238 L278 108 Q300 76 321 113 L429 252Z" fill="#2b1110" stroke="#874021" stroke-width="2"/>
+     <path d="M188 238 L278 108 Q300 76 321 113 L395 238 Q341 221 308 238 Q265 218 230 243Z" fill="url(#mountain)"/>
+     <path d="M268 126 Q299 143 329 124 L353 167 Q317 151 295 169 Q280 151 253 165Z" fill="#f5a13a" opacity=".85"/>
+     <path class="lava-flow" d="M285 128 Q300 153 289 179 L272 211 Q290 225 279 249 L260 261 Q248 239 258 218 L272 183 Q277 155 268 137Z" fill="url(#magma)"/>
+     <path d="M0 264 Q90 242 165 260 Q250 244 335 264 Q435 240 520 261 Q650 239 760 261 L760 300 L0 300Z" fill="#120807"/>
+     <path d="M0 274 Q160 254 260 274 T520 273 T760 270" fill="none" stroke="#e34a17" stroke-width="3" opacity=".5"/>
+     <g fill="#ffca69"><circle class="ember" cx="215" cy="93" r="3"/><circle class="ember" cx="367" cy="77" r="2.5"/><circle class="ember" cx="450" cy="128" r="2"/><circle class="ember" cx="150" cy="154" r="2"/><circle class="ember" cx="335" cy="42" r="2"/></g>
+     <!-- V-2 missile -->
+     <g transform="translate(520 82) rotate(-19)">
+       <path d="M-92 -13 L-118 -34 L-62 -13Z" fill="#2b2b2b"/>
+       <path d="M-92 13 L-118 34 L-62 13Z" fill="#2b2b2b"/>
+       <path d="M-92 -13 L-4 -13 Q36 -12 66 0 Q36 12 -4 13 L-92 13Z" fill="#e8e2d4" stroke="#fff0c7" stroke-width="2"/>
+       <path d="M40 -10 Q54 -7 66 0 Q54 7 40 10Z" fill="#2a2a2a"/>
+       <rect x="-40" y="-13" width="8" height="26" fill="#2a2a2a"/>
+       <path d="M-92 -8 L-103 -10 L-103 10 L-92 8Z" fill="#555"/>
+       <path class="rocket-flame" d="M-103 -9 Q-140 -4 -172 0 Q-140 4 -103 9Z" fill="url(#magma)"/>
+     </g>
+     <path d="M435 48 l6 12 13 2 -10 8 2 13 -11 -7 -11 7 2 -13 -10 -8 13 -2Z" fill="#ffd878" opacity=".8"/>
+     <path d="M600 174 l4 8 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1Z" fill="#ffad49" opacity=".7"/>
+    </svg>
+
+    <p class="subtitle">
+        HISTORY AND GEOGRAPHY HAS ENTERED ARCADE MODE — THE CHALLENGE COMES FIRST.
+        <br>
+        🌋 Volcanic Eruptions • 🚀 V-2 Missile
+    </p>
+
+    <div class="main-play">
+        <button class="play-button" type="button" onclick="openGameArea()">🎮 PLAY NOW</button>
+        <p>Play the interactive challenge first. The full game experience follows the live demonstration.</p>
+
+        <div class="home-tools">
+            <button class="btn" id="leaderboardToggle" type="button" aria-expanded="false" onclick="toggleLeaderboard()">🏆 View Hall of Fame</button>
+            <button class="btn" id="achievementsToggle" type="button" aria-expanded="false" onclick="toggleAchievements()">🎖️ My Achievements</button>
+            <button class="btn" id="profileToggle" type="button" aria-expanded="false" onclick="toggleProfile()">👤 My Profile</button>
+            <button class="btn" type="button" onclick="openMultiplayer()">👥 Multiplayer</button>
+        </div>
+        <div id="leaderboardPanel" class="notice" aria-live="polite" hidden></div>
+        <div id="achievementsPanel" class="notice" aria-live="polite" hidden></div>
+        <div id="profilePanel" class="notice" aria-live="polite" hidden></div>
+    </div>
+
+    <div class="notice" style="border-color:#b85d22">
+        <b>🔥 IMPROVED ARCADE BUILD</b><br>
+        Local prerecorded audio • persistent profile avatar • online career totals • stronger multiplayer recovery
+    </div>
+
+    <div class="notice">
+        <b>🎯 YOUR MISSION</b>
+        <br><br>
+        Play the interactive game before the live demonstration.
+        Earn points, discover the history and geography behind the missions,
+        then watch the physical demonstration. The full game experience is
+        provided after the demonstration.
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <div class="emoji">🌋</div>
+            <h3>VOLCANO RUSH</h3>
+            <p>Play through the eruption zone, collect the correct materials and survive volcanic hazards before the live demonstration.</p>
+        </div>
+
+        <div class="card">
+            <div class="emoji">🚀</div>
+            <h3>ROCKET BATTLE</h3>
+            <p>Take command of a V-2 missile, destroy incoming targets and collect historical knowledge.</p>
+        </div>
+
+        <div class="card">
+            <div class="emoji">🔥</div>
+            <h3>FINAL FURY</h3>
+            <p>Combine both worlds in the final arcade challenge.</p>
+        </div>
+    </div>
+
+    <div class="notice">
+        🏫 DEMONSTRATION SEQUENCE
+        <br><br>
+        1️⃣ Play the interactive challenge first.<br>
+        2️⃣ Watch the live physical demonstration.<br>
+        3️⃣ After the demonstration, the full game experience is provided.
+    </div>
+
+    <div id="playerHistoryPanel" class="notice" aria-live="polite"></div>
+
+    <footer>
+        FIRE AND FURY UNLEASHED • A Demonstration of the Power of Volcanoes
+        and the Strength of the V-2 Missile
+    </footer>
+
+</div>
+</div>
+</section>
+
+<!-- MISSIONS -->
+<section id="missions" class="screen">
+<div class="wrap">
+
+    <h2 class="section-title">🎮 SELECT YOUR MISSION</h2>
+
+    <p class="subtitle">
+        Play the challenge before the live demonstration, learn the story behind it,
+        then continue with the full game experience after the demonstration.
+    </p>
+
+    <div class="grid">
+
+        <div class="card">
+            <div class="emoji">🌋</div>
+            <h3>VOLCANO RUSH</h3>
+            <p>Move across the volcanic field. Collect eruption materials and avoid dangerous rocks.</p>
+            <p><b>Goal:</b> Reach 2,000 points in 45 seconds.</p>
+            <button class="btn gold" type="button" onclick="startGame('volcano')">PLAY 🌋</button>
+        </div>
+
+        <div class="card">
+            <div class="emoji">🚀</div>
+            <h3>ROCKET BATTLE</h3>
+            <p>Take command of a V-2 missile. Destroy targets and collect historical scrolls.</p>
+            <p><b>Goal:</b> Survive for 45 seconds.</p>
+            <button class="btn gold" type="button" onclick="startGame('rocket')">PLAY 🚀</button>
+        </div>
+
+        <div class="card">
+            <div class="emoji">🔥</div>
+            <h3>FINAL FURY</h3>
+            <p>The volcanoes and missiles have decided to cooperate. Unfortunately for you.</p>
+            <p><b>Goal:</b> Survive 60 seconds.</p>
+
+            <div class="ff-avatar-box" style="margin:14px 0">
+                <b>🎭 FINAL FURY PLAYER AVATAR</b>
+                <p style="margin:7px 0;color:#e8c9b5">Final Fury uses your current FIRE &amp; FURY profile avatar.</p>
+                <div id="avatarPreview" aria-live="polite" style="display:flex;justify-content:center;align-items:center;min-height:88px;margin:8px 0">Current avatar: 🌋</div>
+                <button class="btn" type="button" onclick="useCurrentProfileAvatarForFinal()">🔥 USE MY PROFILE AVATAR</button>
+            </div>
+            <button class="btn gold" type="button" onclick="startGame('final')">PLAY 🔥</button>
+        </div>
+
+    </div>
+
+    <div style="text-align:center;margin-top:25px">
+        <button class="btn" type="button" onclick="show('home')">← HOME</button>
+        <button class="btn" type="button" onclick="show('history')">📜 HISTORY</button>
+    </div>
+
+</div>
+</section>
+
+<!-- GAME -->
+<section id="game" class="screen">
+<div class="game-wrap">
+
+    <div class="game-head">
+        <div class="game-stat">🎮 <span id="gameName">GAME</span></div>
+        <div class="game-stat">⭐ <span id="gameScore">0</span></div>
+        <div class="game-stat">❤️ <span id="gameLives">3</span></div>
+        <div class="game-stat">🔥 COMBO <span id="gameCombo">0</span></div>
+        <div class="game-stat">⏱️ <span id="gameTime">60</span></div>
+    </div>
+
+    <div id="mpBattleBar" aria-live="polite"></div>
+
+    <div class="stage">
+        <div class="stage-inner">
+            <canvas id="gameCanvas" width="960" height="600" aria-label="Game area"></canvas>
+
+            <div id="comboBanner" class="combo-banner" role="status" aria-live="polite"></div>
+            <div id="furyModePanel" class="fury-mode-panel" aria-live="polite">
+                🌋 FURY MODE ×2 · <span id="furyModeSeconds">8</span>s
+                <div class="fury-meter"><div id="furyMeterFill" class="fury-meter-fill"></div></div>
+            </div>
+
+            <div class="controls" aria-label="Mobile game controls">
+                <button class="hud-fire" id="fireBtn" type="button" aria-label="Fire">🔥<span>FIRE</span></button>
+                <div class="hud-joystick" id="moveJoystick" aria-label="Move left or right" role="application">
+                    <div class="hud-joystick-track"></div>
+                    <div class="hud-joystick-thumb" id="joystickThumb"></div>
+                    <span class="joy-left">◀</span>
+                    <span class="joy-right">▶</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-message" id="gameMessage">Loading mission...</div>
+
+    <div class="game-actions">
+        <button class="btn" type="button" onclick="quitGame()">✕ QUIT</button>
+    </div>
+
+</div>
+</section>
+
+<!-- HISTORY -->
+<section id="history" class="screen">
+<div class="wrap">
+
+    <h2 class="section-title">📜 HISTORICAL ARCHIVE</h2>
+
+    <div class="card">
+        <h3>🌋 FOUR ERUPTION STYLES</h3>
+        <div class="timeline">
+            <div class="event"><strong>HAWAIIAN</strong><br>
+                Generally associated with highly fluid lava and relatively gentle, steady flows.</div>
+            <div class="event"><strong>STROMBOLIAN</strong><br>
+                Known for intermittent bursts caused by gas bubbles breaking through magma.</div>
+            <div class="event"><strong>VULCANIAN</strong><br>
+                Short explosive eruptions can produce ash-rich clouds when viscous magma or a plug is disrupted.</div>
+            <div class="event"><strong>PLINIAN</strong><br>
+                Powerful sustained eruption columns can rise many kilometres into the atmosphere.</div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+        <h3>🚀 THE V-2 MISSILE</h3>
+        <div class="timeline">
+            <div class="event"><strong>DEVELOPMENT</strong><br>
+                Developed in Germany in the late 1930s and early 1940s by a team led by Wernher von Braun at Peenemünde.</div>
+            <div class="event"><strong>FIRST SUCCESSFUL LAUNCH — 1942</strong><br>
+                The first successful test launch took place on 3 October 1942.
+                The V-2 is widely regarded as the world's first long-range guided ballistic missile.</div>
+            <div class="event"><strong>HOW IT WORKED</strong><br>
+                A liquid-fuel engine burning ethanol with liquid oxygen, steered by gyroscopes and
+                control surfaces. It stood about 14 metres tall and had a range of roughly 320 km.</div>
+            <div class="event"><strong>REACHING SPACE — 1944</strong><br>
+                A V-2 test flight in June 1944 is regarded as the first human-made object to reach space.</div>
+            <div class="event"><strong>WARTIME USE</strong><br>
+                Used operationally from September 1944. It caused great civilian suffering, and its
+                production relied on forced labour — an important part of its history.</div>
+            <div class="event"><strong>LEGACY</strong><br>
+                After the war, captured V-2s and engineers influenced the early rocket programmes of
+                the United States and the Soviet Union.</div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+        <h3>🔥 EARLY ROCKETRY: MYSOREAN ROCKETS</h3>
+        <div class="timeline">
+            <div class="event"><strong>18TH CENTURY</strong><br>
+                Mysorean forces developed and used iron-cased war rockets associated with the armies of Hyder Ali and Tipu Sultan.</div>
+            <div class="event"><strong>ANGLO-MYSORE WARS</strong><br>
+                British forces encountered Mysorean rockets during conflicts with Mysore.</div>
+            <div class="event"><strong>CONGREVE ROCKETS</strong><br>
+                British officers studied Mysorean rocket technology. William Congreve later developed a British military rocket system.</div>
+            <div class="event"><strong>HISTORICAL SIGNIFICANCE</strong><br>
+                Mysorean rockets form an important chapter in early military rocketry — long before the guided,
+                liquid-fuel missiles of the 20th century.</div>
+        </div>
+    </div>
+
+    <div class="notice">
+        ⚠️ Physical demonstrations should be performed under appropriate adult/teacher supervision.
+        <br><br>
+        The website is the interactive game layer. Your real models are the exhibition layer.
+    </div>
+
+    <div style="text-align:center">
+        <button class="btn" type="button" onclick="show('missions')">← MISSIONS</button>
+    </div>
+
+</div>
+</section>
+
+<!-- RESULTS -->
+<section id="results" class="screen">
+<div class="wrap">
+<div class="result">
+
+    <div class="result-trophy">🏆</div>
+
+    <h2 class="section-title">MISSION COMPLETE</h2>
+
+    <div class="bigscore" id="resultScore">0</div>
+
+    <p class="subtitle" id="resultTitle"></p>
+
+    <div class="statgrid">
+        <div class="stat">SCORE <b id="resultPoints">0</b></div>
+        <div class="stat">BEST <b id="resultBest">0</b></div>
+        <div class="stat">COMBO <b id="resultCombo">0</b></div>
+        <div class="stat">CAREER TOTAL <b id="resultCareerTotal">0</b></div>
+        <div class="stat">MATCHES PLAYED <b id="resultMatchesTotal">0</b></div>
+    </div>
+
+    <div class="notice" id="resultNotice"></div>
+
+    <button class="btn gold" type="button" onclick="show('missions')">🎮 PLAY AGAIN</button>
+    <button class="btn" type="button" onclick="show('history')">📜 HISTORY</button>
+
+</div>
+</div>
+</section>
+
+<!-- AUTH MODAL -->
+<div id="authModal" class="ff-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="ff-modal-card narrow">
+    <h2 id="authTitle">🔥 FIRE &amp; FURY ACCOUNT</h2>
+    <p id="authSubtitle">Create a real player account to save your identity, scores and multiplayer profile online.</p>
+
+    <div id="authLoginForm">
+      <label class="ff-label" for="authLoginEmail">📧 Email</label>
+      <input class="ff-field" id="authLoginEmail" type="email" autocomplete="email" placeholder="you@example.com">
+      <label class="ff-label" for="authLoginPassword">🔑 Password</label>
+      <input class="ff-field" id="authLoginPassword" type="password" autocomplete="current-password" placeholder="Your password">
+      <div class="ff-row" style="justify-content:center;margin-top:12px">
+        <button class="btn gold" type="button" onclick="loginFuryAccount()">🔥 LOGIN</button>
+        <button class="btn" type="button" onclick="showAuthSignup()">CREATE ACCOUNT</button>
+      </div>
+      <button class="btn" type="button" style="margin-top:8px" onclick="sendFuryPasswordReset()">Forgot password?</button>
+    </div>
+
+    <div id="authSignupForm" hidden>
+      <label class="ff-label" for="authSignupUsername">👤 Player name</label>
+      <input class="ff-field" id="authSignupUsername" maxlength="24" autocomplete="nickname" placeholder="Your FIRE &amp; FURY name">
+      <label class="ff-label" for="authSignupEmail">📧 Email</label>
+      <input class="ff-field" id="authSignupEmail" type="email" autocomplete="email" placeholder="you@example.com">
+      <label class="ff-label" for="authSignupPassword">🔑 Password</label>
+      <input class="ff-field" id="authSignupPassword" type="password" minlength="6" autocomplete="new-password" placeholder="At least 6 characters">
+      <label class="ff-label" for="authSignupConfirm">🔑 Confirm password</label>
+      <input class="ff-field" id="authSignupConfirm" type="password" minlength="6" autocomplete="new-password" placeholder="Repeat password">
+      <div class="ff-row" style="justify-content:center;margin-top:12px">
+        <button class="btn gold" type="button" onclick="createFuryAccount()">🚀 CREATE ACCOUNT</button>
+        <button class="btn" type="button" onclick="showAuthLogin()">BACK TO LOGIN</button>
+      </div>
+    </div>
+
+    <div id="authRecoveryForm" hidden>
+      <label class="ff-label" for="authNewPassword">🔑 New password</label>
+      <input class="ff-field" id="authNewPassword" type="password" minlength="6" autocomplete="new-password" placeholder="At least 6 characters">
+      <label class="ff-label" for="authNewPasswordConfirm">🔑 Confirm new password</label>
+      <input class="ff-field" id="authNewPasswordConfirm" type="password" minlength="6" autocomplete="new-password" placeholder="Repeat new password">
+      <div class="ff-row" style="justify-content:center;margin-top:12px">
+        <button class="btn gold" type="button" onclick="updateRecoveryPassword()">💾 SAVE NEW PASSWORD</button>
+      </div>
+    </div>
+
+    <div id="authStatus" class="ff-status" style="margin-top:10px">Your account will be used for online multiplayer and global scores.</div>
+  </div>
+</div>
+
+<!-- MULTIPLAYER MODAL -->
+<div id="multiplayerModal" class="ff-modal" role="dialog" aria-modal="true" aria-labelledby="mpTitle">
+  <div class="ff-modal-card">
+    <h2 id="mpTitle">👥 ONLINE MULTIPLAYER</h2>
+    <p>Challenge another FIRE &amp; FURY player on a different device.</p>
+    <div class="ff-row">
+      <input id="mpOpponent" maxlength="24" placeholder="Opponent username" autocomplete="off" aria-label="Opponent username">
+      <button class="btn" type="button" onclick="sendMultiplayerRequest()">⚔️ Send Request</button>
+    </div>
+    <div id="mpIncoming" class="ff-status">Checking for incoming requests…</div>
+    <div id="mpMissionPicker" class="ff-status" style="margin-top:8px">
+      <b>🎮 Choose the online mission</b>
+      <div class="ff-row" style="justify-content:center">
+        <button class="btn" type="button" onclick="selectOnlineMission('volcano')">🌋 Volcano Rush</button>
+        <button class="btn" type="button" onclick="selectOnlineMission('rocket')">🚀 Rocket Battle</button>
+        <button class="btn" type="button" onclick="selectOnlineMission('final')">🔥 Final Fury</button>
+      </div>
+      <div id="mpMissionStatus" style="font-size:.9em;color:#f2d2b6">No mission selected yet.</div>
+    </div>
+    <div id="mpStatus" class="ff-status" style="margin-top:8px">Online multiplayer backend is not connected yet.</div>
+    <div id="mpReadyRow" class="ff-row" style="justify-content:center"></div>
+    <div class="ff-row" style="justify-content:flex-end"><button class="btn" type="button" onclick="closeMultiplayer()">Close</button></div>
+  </div>
+</div>
+
+<!-- Pinned to the 2.45 minor line. For production add an exact version and an
+     integrity="sha384-…" attribute generated from the file you deploy. -->
+
+
+<script>
+/* =====================================================
+   FIRE & FURY ARCADE ENGINE — corrected build
+   -----------------------------------------------------
+   OPTIONAL SERVER SIDE (recommended, run once in the Supabase SQL editor):
+
+   create or replace function public.get_leaderboard()
+   returns table(username text, avatar text, best_score bigint, total_score bigint, games bigint)
+   language sql stable security definer set search_path = public as $$
+     select p.username, p.avatar,
+            coalesce(max(s.score),0)::bigint,
+            coalesce(sum(s.score),0)::bigint,
+            count(s.user_id)::bigint
+     from profiles p left join scores s on s.user_id = p.id
+     group by p.id
+     order by 3 desc, 4 desc, 1
+     limit 100;
+   $$;
+   grant execute on function public.get_leaderboard() to anon, authenticated;
+
+   Also recommended: a unique index on lower(username) in "profiles",
+   and Row Level Security + CHECK constraints on "scores" so players
+   cannot post impossible scores.
+===================================================== */
+
+const $ = id => document.getElementById(id);
+
+/* ---------- Backend config (publishable key only!) ---------- */
+const FF_SUPABASE_URL = "https://owskmswgaehtefaqngmj.supabase.co";
+const FF_SUPABASE_KEY = "sb_publishable_gxEKXEcanTz1Nsb5ifgJkg_xKMe8PAd";
+let ffSupabase = null, ffUser = null, ffRequestChannel = null;
+
+/* =====================================================
+   CANVAS  (logical size 960x600, scaled for sharp output)
+===================================================== */
+const PORTRAIT = window.innerHeight > window.innerWidth * 1.05; const GAME_W = PORTRAIT ? 600 : 960, GAME_H = PORTRAIT ? 800 : 600;
+const DPR = Math.min(2, window.devicePixelRatio || 1);
+const canvas = $("gameCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = Math.round(GAME_W * DPR);
+canvas.height = Math.round(GAME_H * DPR);
+
+/* =====================================================
+   AUDIO — prerecorded local assets
+===================================================== */
+const AUDIO_ASSETS = {
+  menu:'sounds/menu-bgm.mp3', battle:'sounds/battle-bgm.mp3', fury:'sounds/final-fury-bgm.mp3',
+  launch:'sounds/rocket-launch.mp3', explosion:'sounds/explosion.mp3', rock:'sounds/rock-destruction.mp3',
+  victory:'sounds/victory.mp3', defeat:'sounds/defeat.mp3'
+};
+const LOCAL_SFX = { combo: AUDIO_ASSETS.explosion, fury: AUDIO_ASSETS.launch };
+const audioBank = {};
+let soundEnabled = true, masterVolume = 0.75, currentBgm = null, audioUnlocked = false;
+
+function makeAudio(src, loop=false){
+  const a = new Audio(src); a.preload = 'auto'; a.loop = loop; a.volume = masterVolume; return a;
+}
+function initAudio(){
+  if(audioUnlocked) return;
+  audioUnlocked = true;
+  audioBank.menu = makeAudio(AUDIO_ASSETS.menu, true);
+  audioBank.battle = makeAudio(AUDIO_ASSETS.battle, true);
+  audioBank.fury = makeAudio(AUDIO_ASSETS.fury, true);
+  audioBank.launch = makeAudio(AUDIO_ASSETS.launch);
+  audioBank.explosion = makeAudio(AUDIO_ASSETS.explosion);
+  audioBank.rock = makeAudio(AUDIO_ASSETS.rock);
+  audioBank.victory = makeAudio(AUDIO_ASSETS.victory);
+  audioBank.defeat = makeAudio(AUDIO_ASSETS.defeat);
+  audioBank.combo = makeAudio(LOCAL_SFX.combo);
+  audioBank.furySfx = makeAudio(LOCAL_SFX.fury);
+}
+/* Sound effects play on a clone so rapid shots/explosions overlap instead of cutting each other off. */
+function playSfx(name){
+  if(!soundEnabled) return;
+  initAudio();
+  const base = audioBank[name]; if(!base) return;
+  try{
+    const a = base.cloneNode();
+    a.volume = masterVolume;
+    const p = a.play(); if(p && p.catch) p.catch(()=>{});
+  }catch(e){}
+}
+function playBgm(kind){
+  if(!soundEnabled) return;
+  initAudio();
+  const a = audioBank[kind] || audioBank.menu;
+  if(currentBgm === a && !a.paused) return;
+  if(currentBgm){ try{ currentBgm.pause(); currentBgm.currentTime = 0; }catch(e){} }
+  currentBgm = a; a.volume = masterVolume;
+  const p = a.play(); if(p && p.catch) p.catch(()=>{});
+}
+function stopBgm(){
+  if(currentBgm){ try{ currentBgm.pause(); currentBgm.currentTime = 0; }catch(e){} }
+  currentBgm = null;
+}
+function playScreenMusic(id){
+  if(!soundEnabled) return;
+  if(id === 'game') playBgm(gameType === 'final' ? 'fury' : 'battle');
+  else if(id === 'results') stopBgm();
+  else playBgm('menu');
+}
+function toggleSound(){
+  soundEnabled = !soundEnabled;
+  const b = $('soundToggle'); if(b) b.textContent = soundEnabled ? '🔊 SOUND ON' : '🔇 SOUND OFF';
+  if(soundEnabled){
+    initAudio();
+    playScreenMusic(document.querySelector('.screen.active')?.id);
+  } else stopBgm();
+}
+function setMasterVolume(v){
+  masterVolume = Number(v);
+  Object.values(audioBank).forEach(a => a.volume = masterVolume);
+}
+document.addEventListener('pointerdown', () => { initAudio(); if(soundEnabled && !currentBgm) playBgm('menu'); }, {once:true});
+document.addEventListener('keydown', () => { initAudio(); }, {once:true});
+
+/* =====================================================
+   GAME STATE
+===================================================== */
+let animationID = null, gameRunning = false, gameType = "";
+let score = 0, lives = 3, combo = 0, bestCombo = 0;
+let timeLeft = 60, missionTime = 60, lastTime = 0, spawnTimer = 0, fireCooldown = 0;
+let screenShake = 0, eruptionTimer = 0;
+let explosions = [], objects = [], particles = [], floatingTexts = [];
+let player;
+let endGameCalled = false;
+let furyModeRemaining = 0;
+
+const FURY_MODE_SECONDS = 8;
+const INVINCIBILITY_TIME = 1.15;      /* after a hit the player can't be hit again until this reaches 0 */
+const MISSION_TIME = { volcano:45, rocket:45, final:60 };
+const VOLCANO_GOAL = 2000;
+const AVATAR_RADIUS = 24;
+
+const keys = { left:false, right:false, fire:false };
+let invincibilityTimer = 0;
+
+/* Seeded random so both players of an online duel get the same spawns. */
+function hashString(s){
+  let h = 2166136261 >>> 0;
+  for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return h;
+}
+function mulberry32(a){
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+let rng = Math.random;
+
+/* =====================================================
+   SCREEN CONTROL
+===================================================== */
+function show(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+  document.body.classList.toggle("in-game", id === "game");
+  window.scrollTo(0,0);
+  playScreenMusic(id);
+}
+
+/* =====================================================
+   PLAYER PROFILE / LOCAL STORAGE
+===================================================== */
+let activePlayer = "Player";
+let finalAvatar = "🌋";
+let finalAvatarImage = null;
+let onlineTotals = null;                       /* {totalPoints, matches} for the logged-in account */
+const PLAYER_STORE_KEY = "fireFury_playerProfiles_v1";
+const AVATAR_URL_PREFIX = FF_SUPABASE_URL + "/storage/v1/object/public/avatars/";
+
+function escapeHistoryText(value){
+  return String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+
+/* Only images from our own Supabase "avatars" bucket are accepted (no third-party tracking URLs). */
+function isAvatarImage(value){ return String(value || "").startsWith(AVATAR_URL_PREFIX); }
+
+function avatarMarkup(value, size=56){
+  const v = String(value || "🌋");
+  if(isAvatarImage(v)){
+    return `<img class="ff-avatar-img" src="${escapeHistoryText(v)}" alt="Player avatar" width="${size}" height="${size}" loading="lazy" referrerpolicy="no-referrer" onerror="ffAvatarFallback(this)">`;
+  }
+  return `<span class="ff-avatar-fallback" style="width:${size}px;height:${size}px;font-size:${Math.max(1.1,size/32)}rem">${escapeHistoryText(v)}</span>`;
+}
+function ffAvatarFallback(img){
+  const s = document.createElement("span");
+  s.className = "ff-avatar-fallback";
+  s.textContent = "🌋";
+  s.style.width = s.style.height = (img.width || 56) + "px";
+  img.replaceWith(s);
+}
+
+function loadFinalAvatarImage(value){
+  finalAvatarImage = null;
+  if(!isAvatarImage(value)) return;
+  const img = new Image();
+  img.onload = () => { finalAvatarImage = img; if(gameRunning) draw(); };
+  img.onerror = () => { finalAvatarImage = null; };
+  img.src = value;
+}
+
+function safeReadProfiles(){
+  try{
+    const raw = localStorage.getItem(PLAYER_STORE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" ? parsed : {};
+  }catch(error){ return {}; }
+}
+function safeWriteProfiles(profiles){
+  try{ localStorage.setItem(PLAYER_STORE_KEY, JSON.stringify(profiles)); return true; }
+  catch(error){ return false; }
+}
+
+/* Running totals are stored separately from the (trimmed) run list,
+   so career totals and achievements never shrink. */
+function emptyStats(){
+  return { games:0, totalPoints:0, bestScore:0, bestCombo:0, missions:{volcano:0,rocket:0,final:0}, multiplayer:0 };
+}
+function statsFromRuns(runs){
+  const s = emptyStats();
+  (Array.isArray(runs) ? runs : []).forEach(r => {
+    const sc = Number(r.score) || 0;
+    s.games++; s.totalPoints += sc;
+    s.bestScore = Math.max(s.bestScore, sc);
+    s.bestCombo = Math.max(s.bestCombo, Number(r.bestCombo) || 0);
+    if(Object.prototype.hasOwnProperty.call(s.missions, r.mode)) s.missions[r.mode]++;
+    if(r.multiplayer === true) s.multiplayer++;
+  });
+  return s;
+}
+function ensureStats(profile){
+  if(!profile.stats || typeof profile.stats !== "object") profile.stats = statsFromRuns(profile.runs);
+  return profile.stats;
+}
+function getPlayerStats(){
+  const profile = safeReadProfiles()[activePlayer] || { runs: [] };
+  return profile.stats && typeof profile.stats === "object" ? profile.stats : statsFromRuns(profile.runs);
+}
+
+/* =====================================================
+   AVATAR
+===================================================== */
+async function syncAvatarToProfile(value){
+  if(!ffSupabase || !ffUser?.id) return;
+  try{
+    const {error} = await ffSupabase.from("profiles").upsert({id:ffUser.id, username:activePlayer, avatar:value}, {onConflict:"id"});
+    if(error) throw error;
+  }catch(e){ console.warn("Avatar sync", e); }
+}
+
+function setPlayerAvatar(value, opts={sync:true}){
+  const clean = String(value || "").trim();
+  if(!clean) return;
+  finalAvatar = isAvatarImage(clean) ? clean.slice(0,1200) : Array.from(clean).slice(0,2).join("");
+  loadFinalAvatarImage(finalAvatar);
+
+  const profiles = safeReadProfiles();
+  const profile = profiles[activePlayer] || { runs: [] };
+  profile.avatar = finalAvatar;
+  profiles[activePlayer] = profile;
+  safeWriteProfiles(profiles);
+
+  const preview = $("avatarPreview");
+  if(preview) preview.innerHTML = isAvatarImage(finalAvatar)
+    ? 'Current avatar: ' + avatarMarkup(finalAvatar, 72)
+    : 'Current avatar: <span style="font-size:2.2rem">' + escapeHistoryText(finalAvatar) + '</span>';
+
+  if(opts.sync !== false) syncAvatarToProfile(finalAvatar);
+  refreshOpenPanels();
+}
+
+function useCurrentProfileAvatarForFinal(){
+  const profile = safeReadProfiles()[activePlayer];
+  setPlayerAvatar(profile?.avatar || finalAvatar || "🌋", {sync:false});
+}
+
+function setAvatarUploadStatus(message){ const el = $("avatarUploadStatus"); if(el) el.textContent = message; }
+
+function canvasToBlob(c, type, quality){ return new Promise(res => c.toBlob(res, type, quality)); }
+
+async function resizeAvatarImage(file, maxSide){
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error("Could not read image"));
+      i.src = url;
+    });
+    const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+    const w = Math.max(1, Math.round(img.width * scale)), h = Math.max(1, Math.round(img.height * scale));
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    c.getContext("2d").drawImage(img, 0, 0, w, h);
+    let blob = await canvasToBlob(c, "image/webp", 0.86);
+    if(!blob || blob.type !== "image/webp") blob = await canvasToBlob(c, "image/jpeg", 0.86);   /* Safari can't encode WebP */
+    if(!blob) throw new Error("Could not prepare image");
+    return blob;
+  } finally { URL.revokeObjectURL(url); }
+}
+
+async function uploadCustomAvatar(input){
+  const file = input?.files?.[0];
+  if(!file) return;
+  if(!ffUser?.id){
+    setAvatarUploadStatus("🔐 Please log in to your FIRE & FURY account before uploading an avatar.");
+    input.value = ""; return;
+  }
+  if(!/^image\/(png|jpe?g|webp|gif)$/i.test(file.type)){
+    setAvatarUploadStatus("❌ Please choose a PNG, JPG, WEBP, or GIF image."); input.value = ""; return;
+  }
+  if(file.size > 6*1024*1024){
+    setAvatarUploadStatus("❌ Avatar image must be 6 MB or smaller."); input.value = ""; return;
+  }
+  try{
+    setAvatarUploadStatus("⏳ Preparing your avatar…");
+    const blob = await resizeAvatarImage(file, 512);
+    const ext = blob.type === "image/webp" ? "webp" : "jpg";
+    const path = `${ffUser.id}/avatar.${ext}`;
+    const {error:upErr} = await ffSupabase.storage.from("avatars").upload(path, blob, {contentType:blob.type, cacheControl:"3600", upsert:true});
+    if(upErr) throw upErr;
+    /* best-effort cleanup of the other extension so old files don't pile up */
+    try{ await ffSupabase.storage.from("avatars").remove([`${ffUser.id}/avatar.${ext === "webp" ? "jpg" : "webp"}`]); }catch(_){}
+    const {data:urlData} = ffSupabase.storage.from("avatars").getPublicUrl(path);
+    const publicUrl = (urlData?.publicUrl || "") + `?v=${Date.now()}`;
+    const {error:profileError} = await ffSupabase.from("profiles").upsert({id:ffUser.id, username:activePlayer, avatar:publicUrl}, {onConflict:"id"});
+    if(profileError) throw profileError;
+    setPlayerAvatar(publicUrl, {sync:false});
+    setAvatarUploadStatus("✅ Avatar changed successfully. Your new image is now your FIRE & FURY avatar everywhere.");
+  }catch(e){
+    console.error("Avatar upload", e);
+    setAvatarUploadStatus("❌ Avatar upload failed: " + (e?.message || String(e)));
+  }finally{ input.value = ""; }
+}
+
+/* =====================================================
+   HOME PANELS (hall of fame / achievements / profile)
+===================================================== */
+function panelOpen(id){ const el = $(id); return !!el && !el.hidden; }
+function refreshOpenPanels(){
+  if(panelOpen("profilePanel")) renderProfile();
+  if(panelOpen("achievementsPanel")) renderAchievements();
+  if(panelOpen("leaderboardPanel")) renderLeaderboard();
+}
+
+function togglePanel(panelId, buttonId, render, openText, closeText){
+  const panel = $(panelId), button = $(buttonId);
+  if(!panel || !button) return;
+  const opening = panel.hidden;
+  if(opening) render();
+  panel.hidden = !opening;
+  button.setAttribute("aria-expanded", String(opening));
+  button.textContent = opening ? closeText : openText;
+}
+function toggleLeaderboard(){ togglePanel("leaderboardPanel","leaderboardToggle",renderLeaderboard,"🏆 View Hall of Fame","🏆 Hide Hall of Fame"); }
+function toggleAchievements(){ togglePanel("achievementsPanel","achievementsToggle",renderAchievements,"🎖️ My Achievements","🎖️ Hide Achievements"); }
+function toggleProfile(){ togglePanel("profilePanel","profileToggle",renderProfile,"👤 My Profile","👤 Hide Profile"); }
+
+function renderProfile(){
+  const host = $("profilePanel"); if(!host) return;
+  const stats = getPlayerStats();
+  const avatar = safeReadProfiles()[activePlayer]?.avatar || finalAvatar || "🌋";
+  const loggedIn = !!ffUser?.id;
+  host.innerHTML =
+    `<h3>👤 ${escapeHistoryText(activePlayer)}’s Player Profile</h3>
+     <p>Your username and avatar are saved with your FIRE &amp; FURY account.</p>
+     <div class="ff-profile-identity">
+       <div class="ff-profile-avatar">${avatarMarkup(avatar,96)}</div>
+       <div>
+         <div class="ff-profile-username">${escapeHistoryText(activePlayer)}</div>
+         <div class="ff-profile-sub">${loggedIn ? "Permanent FIRE &amp; FURY account" : "Not logged in"}</div>
+       </div>
+     </div>
+     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px">
+       <div class="notice"><strong>🎮 Games</strong><br><span style="font-size:1.5em">${stats.games}</span></div>
+       <div class="notice"><strong>🏆 Best score</strong><br><span style="font-size:1.5em">${stats.bestScore}</span></div>
+       <div class="notice"><strong>⭐ Total points</strong><br><span style="font-size:1.5em">${stats.totalPoints}</span></div>
+       <div class="notice"><strong>🔥 Best combo</strong><br><span style="font-size:1.5em">${stats.bestCombo}</span></div>
+     </div>
+     <div class="ff-avatar-box">
+       <h4 style="margin:8px 0">🖼️ Your Custom Image Avatar</h4>
+       <p style="margin:5px 0 10px">Upload a square or portrait photo. FIRE &amp; FURY automatically resizes it for the profile, Hall of Fame, multiplayer and Final Fury.</p>
+       <input id="accountAvatarFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" onchange="uploadCustomAvatar(this)" style="display:none">
+       <button class="btn" type="button" onclick="document.getElementById('accountAvatarFile')?.click()" ${loggedIn ? "" : 'disabled title="Log in to change your avatar"'}>🖼️ Change Avatar</button>
+       <p id="avatarUploadStatus" style="margin:8px 0;font-size:.9em">${loggedIn ? "Choose a new PNG, JPG, WEBP or GIF image." : "Log in to change your avatar."}</p>
+       <p style="margin:10px 0;font-size:.9em">Current avatar: ${isAvatarImage(finalAvatar) ? '<span class="ff-avatar-inline">'+avatarMarkup(finalAvatar,44)+'</span>' : '<span style="font-size:1.5em">'+escapeHistoryText(finalAvatar)+'</span>'}</p>
+     </div>
+     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px">
+       ${loggedIn ? '' : '<button class="btn" type="button" onclick="switchPlayer()">Switch player</button>'}
+       ${loggedIn ? '<button class="btn" type="button" onclick="logoutFuryAccount()">🚪 Log out</button>' : ''}
+       ${loggedIn ? '<button class="btn danger" type="button" onclick="deleteFuryAccount()">🗑️ Delete account</button>' : ''}
+     </div>
+     <p style="font-size:.88em;color:#e8c9b5">🚪 Log out only ends the current session.</p>`;
+}
+
+/* ---------- Achievements ---------- */
+const FURY_ACHIEVEMENT_CATALOG = [
+  {id:"first_spark",icon:"🌱",title:"First Spark",description:"Complete your first game",test:m=>m.games>=1},
+  {id:"regular_player",icon:"🎮",title:"Regular Player",description:"Complete 5 games",test:m=>m.games>=5},
+  {id:"veteran",icon:"🔥",title:"Veteran",description:"Complete 10 games",test:m=>m.games>=10},
+  {id:"arcade_legend",icon:"👑",title:"Arcade Legend",description:"Complete 25 games",test:m=>m.games>=25},
+  {id:"score_chaser",icon:"⚡",title:"Score Chaser",description:"Reach 1,000 points in one game",test:m=>m.bestScore>=1000},
+  {id:"high_scorer",icon:"💎",title:"High Scorer",description:"Reach 5,000 points in one game",test:m=>m.bestScore>=5000},
+  {id:"score_titan",icon:"🏆",title:"Score Titan",description:"Reach 10,000 points in one game",test:m=>m.bestScore>=10000},
+  {id:"point_collector",icon:"🌟",title:"Point Collector",description:"Earn 10,000 total points",test:m=>m.totalPoints>=10000},
+  {id:"combo_hunter",icon:"🔥",title:"Combo Hunter",description:"Reach a 10-hit combo",test:m=>m.bestCombo>=10},
+  {id:"combo_master",icon:"💥",title:"Combo Master",description:"Reach a 25-hit combo",test:m=>m.bestCombo>=25},
+  {id:"combo_beast",icon:"☄️",title:"Combo Beast",description:"Reach a 50-hit combo",test:m=>m.bestCombo>=50},
+  {id:"volcano_runner",icon:"🌋",title:"Volcano Runner",description:"Complete a Volcano Rush mission",test:m=>m.missions.volcano>=1},
+  {id:"rocket_ace",icon:"🚀",title:"Rocket Ace",description:"Complete a Rocket Battle mission",test:m=>m.missions.rocket>=1},
+  {id:"final_fury",icon:"🔥",title:"Final Fury",description:"Complete a Final Fury mission",test:m=>m.missions.final>=1},
+  {id:"multiplayer",icon:"⚔️",title:"Duelist",description:"Complete an online duel",test:m=>m.multiplayer>=1}
+];
+
+function renderAchievements(){
+  const host = $("achievementsPanel"); if(!host) return;
+  const m = getPlayerStats();
+  const cards = FURY_ACHIEVEMENT_CATALOG.map(a => {
+    const earned = !!a.test(m);
+    return `<div style="padding:12px;border:1px solid rgba(255,255,255,.18);border-radius:10px;opacity:${earned?1:.55}"><strong>${a.icon} ${escapeHistoryText(a.title)}</strong><br><small>${escapeHistoryText(a.description)}</small><br><b>${earned?"✓ Unlocked":"🔒 Locked"}</b></div>`;
+  }).join("");
+  const unlocked = FURY_ACHIEVEMENT_CATALOG.filter(a => a.test(m)).length;
+  host.innerHTML = `<h3>🎖️ FIRE &amp; FURY Achievements</h3><p><b>${unlocked}/${FURY_ACHIEVEMENT_CATALOG.length}</b> unlocked. Achievements are checked automatically after every completed game on this browser.</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px">${cards}</div>`;
+}
+
+/* ---------- Hall of Fame ---------- */
+function hofCards(list){
+  if(!list.length) return '<div class="hof-player" style="grid-column:1/-1">No registered players yet.</div>';
+  return list.map((p,i) =>
+    `<div class="hof-player"><div class="hof-avatar">${avatarMarkup(p.avatar,52)}</div><div class="hof-name">#${i+1} ${escapeHistoryText(p.name)}</div><div class="hof-meta">Best ${p.best} · ${p.games} games · Total ${p.total}</div></div>`
+  ).join("");
+}
+
+async function fetchOnlineStandings(){
+  /* Preferred: server-side aggregation (see SQL at the top of this script). */
+  try{
+    const {data, error} = await ffSupabase.rpc("get_leaderboard");
+    if(!error && Array.isArray(data)){
+      return data.map(r => ({name:r.username, avatar:r.avatar || "🌋", best:Number(r.best_score)||0, total:Number(r.total_score)||0, games:Number(r.games)||0}));
+    }
+  }catch(_){}
+  /* Fallback: client-side aggregation (only accurate while there are < 1000 score rows). */
+  const {data:profiles, error:pErr} = await ffSupabase.from("profiles").select("id,username,avatar");
+  if(pErr) throw pErr;
+  const {data:scores, error:sErr} = await ffSupabase.from("scores").select("user_id,score");
+  if(sErr) throw sErr;
+  const byUser = {};
+  (scores || []).forEach(r => {
+    const x = byUser[r.user_id] ||= {best:0,total:0,games:0};
+    const sc = Number(r.score) || 0;
+    x.best = Math.max(x.best, sc); x.total += sc; x.games++;
+  });
+  return (profiles || []).map(p => ({name:p.username, avatar:p.avatar || "🌋", ...(byUser[p.id] || {best:0,total:0,games:0})}))
+    .sort((a,b) => b.best-a.best || b.total-a.total || a.name.localeCompare(b.name));
+}
+
+let leaderboardRequestId = 0;
+async function renderLeaderboard(){
+  const host = $("leaderboardPanel"); if(!host) return;
+  const requestId = ++leaderboardRequestId;       /* ignore out-of-order responses */
+  host.innerHTML = `<h3>🏆 FIRE &amp; FURY Hall of Fame</h3><p>Loading registered players…</p>`;
+  let onlineError = "";
+  if(multiplayerBackendReady()){
+    try{
+      await ensureSupabaseClient();
+      const standings = await fetchOnlineStandings();
+      if(requestId !== leaderboardRequestId) return;
+      host.innerHTML = `<h3>🏆 FIRE &amp; FURY Hall of Fame</h3><p>Global registered-player standings.</p><div class="hof-grid">${hofCards(standings)}</div>`;
+      return;
+    }catch(e){ onlineError = e?.message || String(e); }
+  }
+  if(requestId !== leaderboardRequestId) return;
+  const standings = Object.entries(safeReadProfiles()).map(([name, profile]) => {
+    const s = profile && profile.stats ? profile.stats : statsFromRuns(profile && profile.runs);
+    return { name, avatar: profile && profile.avatar ? profile.avatar : "🌋", best:s.bestScore, total:s.totalPoints, games:s.games };
+  }).sort((a,b) => b.best-a.best || b.total-a.total || a.name.localeCompare(b.name));
+  host.innerHTML = `<h3>🏆 FIRE &amp; FURY Hall of Fame</h3><p>Local list for this browser — connect to the internet for the global list.</p>${onlineError ? `<p style="color:#ffb5ad">Online Hall of Fame unavailable: ${escapeHistoryText(onlineError)}</p>` : ""}<div class="hof-grid">${hofCards(standings)}</div>`;
+}
+
+/* ---------- Gameplay history ---------- */
+function formatRunDate(d){
+  const t = new Date(d);
+  return isNaN(t) ? String(d || "") : t.toLocaleDateString();
+}
+
+function renderPlayerHistory(){
+  const host = $("playerHistoryPanel"); if(!host) return;
+  const profile = safeReadProfiles()[activePlayer] || { runs: [] };
+  const runs = Array.isArray(profile.runs) ? profile.runs.slice().reverse().slice(0, 12) : [];
+  const rows = runs.length
+    ? runs.map(run => `<tr><td>${escapeHistoryText(formatRunDate(run.date))}</td><td>${escapeHistoryText(run.mode || "")}</td><td>${Number(run.score) || 0}</td><td>${Number(run.bestCombo) || 0}</td><td>${escapeHistoryText(run.outcome || "")}</td></tr>`).join("")
+    : '<tr><td colspan="5">No completed games yet. Play a mission to start your history!</td></tr>';
+  host.innerHTML = `<h3>📜 ${escapeHistoryText(activePlayer)}’s Gameplay History</h3><p>Recent completed runs on this browser</p><div style="overflow-x:auto"><table class="history-table"><thead><tr><th>Date</th><th>Mission</th><th>Score</th><th>Best combo</th><th>Result</th></tr></thead><tbody>${rows}</tbody></table></div>${ffUser?.id ? "" : '<button class="btn" type="button" onclick="switchPlayer()">Switch player</button>'}`;
+  refreshOpenPanels();          /* only re-renders panels that are actually open */
+  updateHeader();
+}
+
+function switchPlayer(){
+  if(ffUser?.id){ alert("Your player name belongs to your FIRE & FURY account. Use Log out to switch accounts."); return; }
+  const entered = prompt("Enter your player name (same name to see your saved history):", activePlayer);
+  if(entered === null) return;
+  const name = entered.trim().replace(/\s+/g, " ").slice(0, 24);
+  if(!name){ alert("Please enter a name."); return; }
+  activePlayer = name;
+  renderPlayerHistory();
+}
+
+function saveCompletedRun(reason){
+  const profiles = safeReadProfiles();
+  const profile = profiles[activePlayer] || { runs: [] };
+  if(!Array.isArray(profile.runs)) profile.runs = [];
+  const stats = ensureStats(profile);            /* must run BEFORE the new run is pushed */
+  stats.games++;
+  stats.totalPoints += score;
+  stats.bestScore = Math.max(stats.bestScore, score);
+  stats.bestCombo = Math.max(stats.bestCombo, bestCombo);
+  if(Object.prototype.hasOwnProperty.call(stats.missions, gameType)) stats.missions[gameType]++;
+  if(window.ffMultiplayerGame) stats.multiplayer++;
+
+  profile.runs.push({ date:new Date().toISOString(), mode:gameType, score, bestCombo, multiplayer:!!window.ffMultiplayerGame, outcome: reason === "LIVES" ? "Out of lives" : "Time completed" });
+  profile.runs = profile.runs.slice(-100);       /* the list is trimmed, the stats are not */
+  profiles[activePlayer] = profile;
+  safeWriteProfiles(profiles);
+
+  if(onlineTotals){ onlineTotals.totalPoints += score; onlineTotals.matches++; }   /* optimistic; confirmed below */
+  renderPlayerHistory();
+
+}
+
+/* ---------- Entry gates ---------- */
+function openGameArea(){
+  if(!canPlayFuryGame()){
+    openAuthGate();
+    setAuthStatus("🔐 Please Login or Sign Up to enter the missions.");
+    return;
+  }
+  show("missions");
+}
+
+function dismissStartScreen(){
+  $("startScreen")?.classList.add("hidden");
+  show("home");
+}
+
+/* =====================================================
+   HEADER TOTALS
+===================================================== */
+function getActivePlayerTotals(){
+  const s = getPlayerStats();
+  return { totalPoints:s.totalPoints, matches:s.games };
+}
+
+function getDisplayTotals(){ return onlineTotals || getActivePlayerTotals(); }
+
+function updateHeader(){
+  const totals = getDisplayTotals();
+  const scoreNode = $("headerScore"), matchesNode = $("headerMatches");
+  if(scoreNode) scoreNode.textContent = totals.totalPoints;
+  if(matchesNode) matchesNode.textContent = totals.matches;
+}
+
+/* Supabase is the source of truth for permanent accounts; localStorage is the offline fallback. */
+let onlineTotalsRequestId = 0;
+async function refreshOnlineTotals(){
+  const requestId = ++onlineTotalsRequestId;
+  if(!ffSupabase || !ffUser?.id) return null;
+  try{
+    const {data, error} = await ffSupabase.from("scores").select("score").eq("user_id", ffUser.id);
+    if(error) throw error;
+    if(requestId !== onlineTotalsRequestId) return null;
+    const rows = Array.isArray(data) ? data : [];
+    onlineTotals = { totalPoints: rows.reduce((sum,row) => sum + (Number(row?.score)||0), 0), matches: rows.length };
+    updateHeader();
+    return onlineTotals;
+  }catch(e){
+    console.warn("Online career totals unavailable", e);
+    return null;
+  }
+}
+
+/* =====================================================
+   START GAME
+===================================================== */
+function resetFuryUI(){
+  furyModeRemaining = 0;
+  $("furyModePanel")?.classList.remove("active");
+  canvas.classList.remove("fury-aura","hit");
+  const banner = $("comboBanner");
+  if(banner) banner.classList.remove("show","break");
+}
+
+function startGame(type, multiplayer=false){
+  if(!canPlayFuryGame()){
+    openAuthGate();
+    setAuthStatus("🔐 Please Login or Sign Up to play FIRE AND FURY UNLEASHED.");
+    return;
+  }
+
+  /* stop any previous run */
+  gameRunning = false;
+  endGameCalled = false;
+  if(animationID){ cancelAnimationFrame(animationID); animationID = null; }
+
+  gameType = type;
+  if(type === "final"){
+    const storedAvatar = safeReadProfiles()[activePlayer]?.avatar;
+    if(storedAvatar) setPlayerAvatar(storedAvatar, {sync:false});
+    else loadFinalAvatarImage(finalAvatar);
+  }
+
+  window.ffMultiplayerGame = !!multiplayer;
+  if(multiplayer){
+    ffMatch.localDone = false; ffMatch.opponentDone = false; ffMatch.opponentGone = false;
+    ffMatch.opponentScore = 0; ffLastBroadcast = 0;
+    rng = mulberry32(hashString(String(ffMatch.id) + ":" + type));     /* identical spawns for both players */
+    updateMpBattleBar("⚔️ ONLINE DUEL • You: 0 • Opponent: 0");
+  }else{
+    rng = Math.random;
+    $("mpBattleBar")?.classList.remove("show");
+  }
+
+  score = 0; lives = 3; combo = 0; bestCombo = 0;
+  resetFuryUI();
+
+  missionTime = MISSION_TIME[type] || 45;
+  timeLeft = missionTime;
+
+  objects = []; particles = []; floatingTexts = []; explosions = [];
+  spawnTimer = .35; fireCooldown = 0; screenShake = 0; eruptionTimer = 0; invincibilityTimer = 0;
+
+  player = { x:GAME_W/2, y:GAME_H-70, width:48, height:48, speed:420 };
+
+  $("gameName").textContent =
+      type === "volcano" ? "🌋 VOLCANO RUSH"
+    : type === "rocket"  ? "🚀 ROCKET BATTLE"
+    :                      "🔥 FINAL FURY";
+
+  $("gameMessage").textContent =
+      type === "volcano" ? "Collect eruption materials 💧🔥💨☁️ and dodge the falling boulders! Goal: 2,000 points."
+    : type === "rocket"  ? "Shoot targets 🎯 and collect historical scrolls 📜 with your V-2!"
+    :                      "Survive the combined FIRE & FURY assault! Shoot enemies and boulders with 🔥 or SPACE!";
+
+  /* no shooting in volcano mode */
+  $("fireBtn").style.display = type === "volcano" ? "none" : "";
+
+  updateGameUI();
+  show("game");
+
+  gameRunning = true;
+  lastTime = performance.now();
+  animationID = requestAnimationFrame(gameLoop);
+}
+
+/* =====================================================
+   GAME LOOP
+===================================================== */
+function gameLoop(now){
+  if(!gameRunning) return;
+
+  const dt = Math.min((now - lastTime) / 1000, .035);
+  lastTime = now;
+
+  if(furyModeRemaining > 0){
+    furyModeRemaining = Math.max(0, furyModeRemaining - dt);
+    const secondsEl = $("furyModeSeconds"), fillEl = $("furyMeterFill");
+    if(secondsEl) secondsEl.textContent = furyModeRemaining.toFixed(1);
+    if(fillEl) fillEl.style.width = (100 * furyModeRemaining / FURY_MODE_SECONDS) + "%";
+    if(furyModeRemaining <= 0){
+      $("furyModePanel")?.classList.remove("active");
+      canvas.classList.remove("fury-aura");
+    }
+  }
+
+  update(dt);
+  if(!gameRunning) return;
+  draw();
+
+  if(window.ffMultiplayerGame && ffMatch.channel && now - ffLastBroadcast > 150){
+    ffLastBroadcast = now;
+    mpSend({kind:"score", userId:ffUser.id, score:score, combo:bestCombo});
+    updateMpBattleBar(`⚔️ ONLINE DUEL • You: ${score} • Opponent: ${ffMatch.opponentScore}`);
+  }
+
+  if(gameRunning) animationID = requestAnimationFrame(gameLoop);
+}
+
+/* Spawn gets faster as the mission goes on. */
+function spawnInterval(){
+  const elapsed = missionTime - timeLeft;
+  const base = gameType === "final" ? .55 : .62;
+  return Math.max(.28, base - elapsed * .0055);
+}
+
+/* =====================================================
+   UPDATE
+===================================================== */
+function update(dt){
+  if(!gameRunning) return;
+
+  /* TIME */
+  timeLeft -= dt;
+  if(timeLeft <= 0){ timeLeft = 0; endGame("TIME"); return; }
+
+  /* INVINCIBILITY */
+  if(invincibilityTimer > 0) invincibilityTimer = Math.max(0, invincibilityTimer - dt);
+
+  /* PLAYER */
+  if(keys.left)  player.x -= player.speed * dt;
+  if(keys.right) player.x += player.speed * dt;
+  player.x = Math.max(30, Math.min(GAME_W - 30, player.x));
+
+  /* FIRE */
+  fireCooldown -= dt;
+  if(keys.fire && fireCooldown <= 0 && gameType !== "volcano"){
+    fire();
+    fireCooldown = gameType === "rocket" ? .22 : .30;
+  }
+
+  /* SPAWN */
+  spawnTimer -= dt;
+  if(spawnTimer <= 0){ spawnObject(); spawnTimer = spawnInterval(); }
+
+  /* NORMAL OBJECTS (mark-and-sweep) */
+  const removeNormal = new Set();
+  for(let i = 0; i < objects.length; i++){
+    const o = objects[i];
+    if(o.type === "bullet") continue;
+
+    o.y += o.speed * dt;
+    if(o.type === "enemy" || o.type === "rock") o.rotation += o.spin * dt;
+
+    if(o.hazard === true && invincibilityTimer <= 0 && collision(player, objectHitbox(o))){
+      playerHit();
+      if(!gameRunning) return;          /* final life lost */
+      removeNormal.add(i);
+      continue;
+    }
+    if(o.collectible === true && collision(player, objectHitbox(o))){
+      collectObject(o);
+      removeNormal.add(i);
+      continue;
+    }
+    if(o.y > GAME_H + 80) removeNormal.add(i);
+  }
+  if(removeNormal.size > 0) objects = objects.filter((_, idx) => !removeNormal.has(idx));
+
+  /* PROJECTILES */
+  for(const o of objects) if(o.type === "bullet") o.y -= o.speed * dt;
+
+  const removeSet = new Set();
+  const destroyed = [];
+  for(let i = 0; i < objects.length; i++){
+    const o = objects[i];
+    if(o.type !== "bullet") continue;
+    for(let j = 0; j < objects.length; j++){
+      const target = objects[j];
+      if(target.shootable === true && !removeSet.has(j) &&
+         collision({x:o.x, y:o.y, width:8, height:18}, objectHitbox(target))){
+        destroyed.push(target);
+        removeSet.add(j);
+        removeSet.add(i);               /* one target per bullet */
+        break;
+      }
+    }
+    if(o.y < -30) removeSet.add(i);
+  }
+  destroyed.forEach(destroyTarget);
+  if(removeSet.size > 0) objects = objects.filter((_, idx) => !removeSet.has(idx));
+
+  /* HARD SAFETY CAPS */
+  if(objects.length > 90){
+    const bullets = objects.filter(o => o.type === "bullet");
+    const others = objects.filter(o => o.type !== "bullet").slice(-70);
+    objects = others.concat(bullets);
+  }
+  if(particles.length > 140) particles = particles.slice(-100);
+  if(floatingTexts.length > 30) floatingTexts = floatingTexts.slice(-20);
+
+  updateParticles(dt);
+  updateExplosions(dt);
+
+  if(gameType === "volcano"){
+    eruptionTimer -= dt;
+    if(eruptionTimer <= 0){
+      eruptionTimer = 0.45 + Math.random() * 0.8;
+      createEruptionBurst();
+    }
+  }
+
+  screenShake = Math.max(0, screenShake - dt * 22);
+  updateFloatingTexts(dt);
+  updateGameUI();
+}
+
+/* x/y are the CENTRE of every object, matching the player's collision box. */
+function objectHitbox(o){ return { x:o.x, y:o.y, width:o.size, height:o.size }; }
+
+/* =====================================================
+   SPAWN OBJECTS
+===================================================== */
+function spawnObject(){
+  const o = {
+    x: 30 + rng() * (GAME_W - 60),
+    y: -50,
+    size: 38,
+    speed: 100 + rng() * 130,
+    rotation: 0,
+    spin: (rng() - .5) * 5,
+    type: "", good:false, value:0,
+    hazard:false, collectible:false, shootable:false
+  };
+  const r = rng();
+
+  if(gameType === "volcano"){
+    if(r < .23){ o.type = "water"; o.good = true; o.collectible = true; o.value = 100; }
+    else if(r < .46){ o.type = "lava"; o.good = true; o.collectible = true; o.value = 150; }
+    else if(r < .65){ o.type = "gas";  o.good = true; o.collectible = true; o.value = 200; }
+    else if(r < .80){ o.type = "ash";  o.good = true; o.collectible = true; o.value = 250; }
+    else { o.type = "rock"; o.size = 44; o.hazard = true; }
+  }
+  else if(gameType === "rocket"){
+    if(r < .72){
+      /* shootable target — does NOT hurt the player by touching it */
+      o.type = "target"; o.value = 200; o.shootable = true;
+    }else{
+      /* historical scroll: collect it OR shoot it */
+      o.type = "scroll"; o.good = true; o.collectible = true; o.shootable = true; o.value = 500;
+    }
+  }
+  else{
+    if(r < .38){ o.type = "enemy"; o.value = 250; o.hazard = true; o.shootable = true; }
+    else if(r < .60){ o.type = "scroll"; o.good = true; o.collectible = true; o.shootable = true; o.value = 500; }
+    else if(r < .78){ o.type = "lava"; o.good = true; o.collectible = true; o.value = 150; }
+    else { o.type = "rock"; o.size = 44; o.hazard = true; o.shootable = true; }
+  }
+  objects.push(o);
+}
+
+/* =====================================================
+   SCORING, COMBOS, FURY MODE
+===================================================== */
+function addScore(points){
+  const gained = points * (furyModeRemaining > 0 ? 2 : 1);     /* Fury Mode doubles all points */
+  score += gained;
+  return gained;
+}
+
+function showComboFeedback(kind){
+  const banner = $("comboBanner"), stat = $("gameCombo");
+  if(stat){
+    stat.parentElement.classList.remove("combo-stat-hot");
+    void stat.parentElement.offsetWidth;
+    stat.parentElement.classList.add("combo-stat-hot");
+  }
+  if(!banner || combo < 2) return;
+
+  let message = `🔥 COMBO x${combo}`;
+  if(combo >= 10) message = `🌋 FURY UNLEASHED · x${combo}`;
+  else if(combo >= 5) message = `⚡ FURY STREAK · x${combo}`;
+  else if(combo === 3) message = `🔥 COMBO STARTED · x${combo}`;
+
+  if(kind === "collect") playSfx('combo');      /* destroying a target already plays its own explosion */
+
+  banner.textContent = message + (kind === "target" ? " · IMPACT BONUS" : " · SCORE BONUS");
+  banner.classList.remove("show","break");      /* "break" must be cleared or the banner stays grey forever */
+  void banner.offsetWidth;
+  banner.classList.add("show");
+
+  if(combo >= 10 && furyModeRemaining <= 0){
+    playSfx('furySfx');
+    furyModeRemaining = FURY_MODE_SECONDS;
+    $("furyModePanel")?.classList.add("active");
+    canvas.classList.add("fury-aura");
+    banner.textContent = "🌋 FURY MODE ACTIVATED! ×2 SCORE · x" + combo;
+  }
+}
+
+function registerHit(kind){
+  combo++;
+  bestCombo = Math.max(bestCombo, combo);
+  showComboFeedback(kind);
+}
+
+function collectObject(o){
+  registerHit("collect");
+  const value = o.value || 100;
+  const bonus = combo >= 3 ? combo * 10 : 0;
+  const gained = addScore(value + bonus);
+
+  if(combo > 0 && combo % 5 === 0){
+    floatingText(o.x, o.y - 34, "🔥 FURY STREAK x" + combo + "!");
+    createParticles(o.x, o.y, 14, "#ffd15a");
+  }
+  floatingText(o.x, bonus ? o.y - 20 : o.y, "+" + gained + (bonus ? " +COMBO" : "") + (furyModeRemaining > 0 ? " ×2" : ""));
+  createParticles(o.x, o.y, 12, "#ffd35c");
+}
+
+function fire(){
+  playSfx('launch');
+  screenShake = Math.max(screenShake, 2.5);
+  createParticles(player.x, player.y - 28, 8, "#fff0a0");
+  objects.push({ type:"bullet", x:player.x, y:player.y - 30, speed:650, size:8 });
+  createParticles(player.x, player.y - 25, 4, "#ffb52e");
+}
+
+function destroyTarget(o){
+  playSfx(o.type === 'rock' ? 'rock' : 'explosion');
+  registerHit("target");
+  const value = o.value || 200;
+  const bonus = combo >= 3 ? combo * 25 : 0;
+  const gained = addScore(value + bonus);
+
+  if(combo > 0 && combo % 5 === 0){
+    floatingText(o.x, o.y - 34, "🔥 FURY STREAK x" + combo + "!");
+    createParticles(o.x, o.y, 14, "#ffd15a");
+  }
+  floatingText(o.x, o.y, "+" + gained + (furyModeRemaining > 0 ? " ×2" : ""));
+  createParticles(o.x, o.y, 24, "#ff7a22");
+  createExplosion(o.x, o.y, "#ffb52e");
+  screenShake = Math.max(screenShake, 7);
+}
+
+function playerHit(){
+  if(invincibilityTimer > 0 || !gameRunning) return;
+
+  lives--;
+  if(combo >= 3){
+    const banner = $("comboBanner");
+    if(banner){
+      banner.textContent = "💥 COMBO BROKEN! BUILD IT AGAIN";
+      banner.classList.remove("show");
+      banner.classList.add("break");
+      void banner.offsetWidth;
+      banner.classList.add("show");
+    }
+  }
+  combo = 0;
+  invincibilityTimer = INVINCIBILITY_TIME;
+
+  createParticles(player.x, player.y, 28, "#ff351d");
+  createExplosion(player.x, player.y, "#ff4b24");
+  screenShake = Math.max(screenShake, 10);
+  floatingText(player.x, player.y, "-1 ❤️");
+
+  canvas.classList.remove("hit");
+  void canvas.offsetWidth;
+  canvas.classList.add("hit");
+
+  if(lives <= 0){
+    lives = 0;
+    updateGameUI();
+    /* HARD STOP — prevent any further processing this frame */
+    gameRunning = false;
+    objects = []; particles = []; floatingTexts = [];
+    keys.left = keys.right = keys.fire = false;
+    if(animationID){ cancelAnimationFrame(animationID); animationID = null; }
+    Promise.resolve().then(() => endGame("LIVES"));
+  }
+}
+
+function collision(a, b){
+  return a.x - a.width/2  < b.x + b.width/2  &&
+         a.x + a.width/2  > b.x - b.width/2  &&
+         a.y - a.height/2 < b.y + b.height/2 &&
+         a.y + a.height/2 > b.y - b.height/2;
+}
+
+/* =====================================================
+   DRAW
+===================================================== */
+function draw(){
+  if(!player) return;                         /* nothing to draw before the first game starts */
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.clearRect(0, 0, GAME_W, GAME_H);
+
+  ctx.save();
+  if(screenShake > 0) ctx.translate((Math.random() - 0.5) * screenShake, (Math.random() - 0.5) * screenShake);
+  drawBackground();
+  drawObjects();
+  drawPlayer();
+  drawParticles();
+  drawExplosions();
+  ctx.restore();
+
+  drawFloatingTexts();
+}
+
+const bgGradients = {};
+function getBackgroundGradient(type){
+  if(bgGradients[type]) return bgGradients[type];
+  const g = ctx.createLinearGradient(0, 0, 0, GAME_H);
+  if(type === "volcano"){ g.addColorStop(0,"#7a3a1c"); g.addColorStop(.55,"#5a2a16"); g.addColorStop(1,"#3d1c10"); }
+  else if(type === "rocket"){ g.addColorStop(0,"#243868"); g.addColorStop(.55,"#2e2458"); g.addColorStop(1,"#1a1638"); }
+  else { g.addColorStop(0,"#7a3a1c"); g.addColorStop(.5,"#3a2460"); g.addColorStop(1,"#201830"); }
+  bgGradients[type] = g;
+  return g;
+}
+
+function drawBackground(){
+  ctx.fillStyle = getBackgroundGradient(gameType);
+  ctx.fillRect(0, 0, GAME_W, GAME_H);
+
+  ctx.fillStyle = "#ffffffee";
+  for(let i = 0; i < 55; i++){
+    ctx.fillRect((i * 173) % GAME_W, (i * 83) % GAME_H, 2, 2);
+  }
+
+  if(gameType === "volcano"){
+    ctx.fillStyle = "#ff8a4080";
+    ctx.beginPath(); ctx.moveTo(0, GAME_H); ctx.lineTo(180, 430); ctx.lineTo(310, GAME_H); ctx.fill();
+    ctx.fillStyle = "#ffaa5070";
+    ctx.beginPath(); ctx.moveTo(580, GAME_H); ctx.lineTo(720, 400); ctx.lineTo(GAME_W, GAME_H); ctx.fill();
+  }
+}
+
+/* The Rocket Battle player is a V-2 missile (nose up). */
+function drawV2(){
+  const flicker = Math.sin(performance.now() * 0.05) * 4;
+
+  /* exhaust flame */
+  ctx.fillStyle = "#ffbd35";
+  ctx.beginPath(); ctx.moveTo(-7, 27); ctx.lineTo(0, 50 + flicker); ctx.lineTo(7, 27); ctx.fill();
+  ctx.fillStyle = "#fff0a0";
+  ctx.beginPath(); ctx.moveTo(-3.5, 27); ctx.lineTo(0, 40 + flicker / 2); ctx.lineTo(3.5, 27); ctx.fill();
+
+  /* tail fins */
+  ctx.fillStyle = "#2b2b2b";
+  ctx.beginPath(); ctx.moveTo(-9, 6);  ctx.lineTo(-22, 27); ctx.lineTo(-9, 23); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(9, 6);   ctx.lineTo(22, 27);  ctx.lineTo(9, 23);  ctx.closePath(); ctx.fill();
+
+  /* body + ogive nose */
+  ctx.fillStyle = "#e6dfcf";
+  ctx.strokeStyle = "#8a8576";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(0, -34);
+  ctx.quadraticCurveTo(10, -18, 10, -6);
+  ctx.lineTo(10, 23);
+  ctx.lineTo(-10, 23);
+  ctx.lineTo(-10, -6);
+  ctx.quadraticCurveTo(-10, -18, 0, -34);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+
+  /* dark nose tip and band */
+  ctx.fillStyle = "#2a2a2a";
+  ctx.beginPath();
+  ctx.moveTo(0, -34);
+  ctx.quadraticCurveTo(5, -27, 6.5, -21);
+  ctx.lineTo(-6.5, -21);
+  ctx.quadraticCurveTo(-5, -27, 0, -34);
+  ctx.fill();
+  ctx.fillRect(-10, -2, 20, 5);
+
+  /* nozzle */
+  ctx.fillStyle = "#555";
+  ctx.fillRect(-6, 23, 12, 5);
+}
+
+function drawPlayer(){
+  ctx.save();
+  ctx.translate(player.x, player.y + Math.sin(performance.now() * 0.008) * 2);
+
+  /* blink while invincible */
+  if(invincibilityTimer > 0 && Math.floor(invincibilityTimer * 12) % 2 === 0) ctx.globalAlpha = .35;
+
+  if(gameType === "rocket"){
+    drawV2();
+  }else if(gameType === "final" && finalAvatarImage){
+    ctx.save();
+    ctx.beginPath(); ctx.arc(0, 0, AVATAR_RADIUS, 0, Math.PI * 2); ctx.clip();
+    ctx.drawImage(finalAvatarImage, -AVATAR_RADIUS, -AVATAR_RADIUS, AVATAR_RADIUS * 2, AVATAR_RADIUS * 2);
+    ctx.restore();
+  }else{
+    ctx.font = "45px serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(gameType === "final" ? finalAvatar : "🌋", 0, 0);
+  }
+  ctx.restore();
+}
+
+const OBJECT_EMOJI = {
+  water:["💧",34], lava:["🔥",34], gas:["💨",34], ash:["☁️",34],
+  target:["🎯",38], scroll:["📜",34], enemy:["💥",38]
+};
+
+function drawRock(o){
+  const r = Math.max(12, (Number(o.size) || 44) * 0.55);     /* visual size now matches the hitbox */
+  const pulse = 1 + Math.sin(performance.now() * .008 + o.x) * .025;
+  ctx.scale(pulse, pulse);
+
+  ctx.shadowColor = "rgba(55,35,20,.35)";
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 5;
+
+  ctx.beginPath();
+  ctx.moveTo(-r*.95, r*.18); ctx.lineTo(-r*.72, -r*.62); ctx.lineTo(-r*.12, -r*.96);
+  ctx.lineTo(r*.58, -r*.72); ctx.lineTo(r*.98, -.08*r);  ctx.lineTo(r*.62, r*.72);
+  ctx.lineTo(-r*.12, r*.92); ctx.lineTo(-r*.78, r*.68);
+  ctx.closePath();
+
+  const rockGrad = ctx.createLinearGradient(-r, -r, r, r);
+  rockGrad.addColorStop(0, "#b9aa96"); rockGrad.addColorStop(.38, "#887b6a");
+  rockGrad.addColorStop(.72, "#655b50"); rockGrad.addColorStop(1, "#403a34");
+  ctx.fillStyle = rockGrad;
+  ctx.fill();
+
+  ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+  ctx.lineWidth = 2; ctx.strokeStyle = "#302c27"; ctx.stroke();
+
+  /* facets */
+  ctx.beginPath(); ctx.moveTo(-r*.72,-r*.62); ctx.lineTo(-r*.12,-r*.96); ctx.lineTo(-r*.05,-r*.18); ctx.lineTo(-r*.52,r*.02); ctx.closePath();
+  ctx.fillStyle = "rgba(235,224,207,.34)"; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-r*.05,-r*.18); ctx.lineTo(r*.58,-r*.72); ctx.lineTo(r*.98,-.08*r); ctx.lineTo(r*.32,r*.22); ctx.closePath();
+  ctx.fillStyle = "rgba(255,244,220,.16)"; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(-r*.52,r*.02); ctx.lineTo(r*.32,r*.22); ctx.lineTo(r*.62,r*.72); ctx.lineTo(-r*.12,r*.92); ctx.closePath();
+  ctx.fillStyle = "rgba(35,31,28,.22)"; ctx.fill();
+}
+
+function drawBullet(o){
+  const pulse = 0.8 + Math.sin(performance.now() * 0.035 + o.y) * 0.2;
+  const trail = ctx.createLinearGradient(0, 2, 0, 38);
+  trail.addColorStop(0, "rgba(255,250,180,.95)");
+  trail.addColorStop(.35, "rgba(255,140,24,.62)");
+  trail.addColorStop(1, "rgba(255,70,10,0)");
+  ctx.globalAlpha = pulse;
+  ctx.strokeStyle = trail; ctx.lineWidth = 9; ctx.lineCap = "round";
+  ctx.beginPath(); ctx.moveTo(0, 1); ctx.lineTo(0, 38); ctx.stroke();
+  ctx.fillStyle = "#fffbd0";
+  ctx.shadowColor = "#ff6417"; ctx.shadowBlur = 25;
+  ctx.beginPath(); ctx.arc(0, -3, 7.5 * pulse, 0, Math.PI * 2); ctx.fill();
+}
+
+function drawObjects(){
+  const t = performance.now();
+  objects.forEach(o => {
+    ctx.save();
+    const bob = o.type === "bullet" ? 0 : Math.sin(t * 0.006 + o.x * 0.02) * 2;
+    ctx.translate(o.x, o.y + bob);
+    ctx.rotate(o.rotation || 0);
+
+    const em = OBJECT_EMOJI[o.type];
+    if(em){
+      ctx.font = em[1] + "px serif";
+      ctx.textAlign = "center";
+      ctx.fillText(em[0], 0, 10);
+    }else if(o.type === "rock") drawRock(o);
+    else if(o.type === "bullet") drawBullet(o);
+
+    ctx.restore();
+  });
+}
+
+/* =====================================================
+   PARTICLES / EXPLOSIONS / FLOATING TEXT
+===================================================== */
+function createParticles(x, y, count, color){
+  count = Math.min(count, Math.max(0, 120 - particles.length));       /* hard cap */
+  for(let i = 0; i < count; i++){
+    const life = .5 + Math.random() * .7;
+    particles.push({
+      x, y,
+      vx:(Math.random() - .5) * 250,
+      vy:(Math.random() - .5) * 250,
+      life, max:life, color,
+      size:3 + Math.random() * 5
+    });
+  }
+}
+
+function updateParticles(dt){
+  for(let i = particles.length - 1; i >= 0; i--){
+    const p = particles[i];
+    p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 180 * dt; p.life -= dt;
+    if(p.life <= 0) particles.splice(i, 1);
+  }
+}
+
+function drawParticles(){
+  particles.forEach(p => {
+    ctx.globalAlpha = Math.max(0, p.life / p.max);
+    ctx.fillStyle = p.color;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+}
+
+function createExplosion(x, y, color){
+  explosions.push({x, y, radius:8, max:62, life:.38, color});
+  if(explosions.length > 24) explosions.shift();
+}
+
+function updateExplosions(dt){
+  explosions.forEach(e => {
+    e.life -= dt;
+    e.radius += (e.max - e.radius) * Math.min(1, dt * 10);
+  });
+  explosions = explosions.filter(e => e.life > 0);
+}
+
+function drawExplosions(){
+  explosions.forEach(e => {
+    const a = Math.max(0, e.life / .38);
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.strokeStyle = e.color; ctx.lineWidth = 3 + a * 5;
+    ctx.shadowColor = e.color; ctx.shadowBlur = 18;
+    ctx.beginPath(); ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = "rgba(255,245,190," + (a * .75) + ")"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(e.x, e.y, e.radius * .62, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = a * .7; ctx.fillStyle = "#fff2a0";
+    ctx.beginPath(); ctx.arc(e.x, e.y, Math.max(3, e.radius * .22), 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  });
+}
+
+function createEruptionBurst(){
+  const x = GAME_W * (0.5 + (Math.random() - .5) * .16);
+  const y = GAME_H * .36;
+  for(let i = 0; i < 12 && particles.length < 120; i++){
+    const life = .65 + Math.random() * .75;
+    particles.push({
+      x:x + (Math.random() - .5) * 22, y:y + (Math.random() - .5) * 12,
+      vx:(Math.random() - .5) * 210, vy:-100 - Math.random() * 260,
+      life, max:life, color:Math.random() < .55 ? "#ff7a22" : "#ffd35c",
+      size:3 + Math.random() * 6
+    });
+  }
+  if(Math.random() < .55) createExplosion(x, y, "#ff7a22");
+  screenShake = Math.max(screenShake, 2.5);
+}
+
+function floatingText(x, y, text){
+  if(floatingTexts.length >= 24) floatingTexts.shift();
+  floatingTexts.push({x, y, text, life:1});
+}
+
+function updateFloatingTexts(dt){
+  floatingTexts.forEach(t => { t.y -= 45 * dt; t.life -= dt; });
+  floatingTexts = floatingTexts.filter(t => t.life > 0);
+}
+
+function drawFloatingTexts(){
+  floatingTexts.forEach(t => {
+    ctx.globalAlpha = Math.max(0, t.life);
+    ctx.fillStyle = "#ffd35c";
+    ctx.strokeStyle = "rgba(0,0,0,.65)";
+    ctx.lineWidth = 3;
+    ctx.font = "bold 22px Georgia";
+    ctx.textAlign = "center";
+    ctx.strokeText(t.text, t.x, t.y);
+    ctx.fillText(t.text, t.x, t.y);
+  });
+  ctx.globalAlpha = 1;
+}
+
+/* =====================================================
+   GAME HUD (text)
+===================================================== */
+const ui = {
+  score:$("gameScore"), lives:$("gameLives"), combo:$("gameCombo"), time:$("gameTime")
+};
+
+function updateGameUI(){
+  ui.score.textContent = score;
+  ui.lives.textContent = lives;
+  ui.combo.textContent = combo;
+  ui.time.textContent = Math.ceil(timeLeft);
+}
+
+/* =====================================================
+   END GAME
+===================================================== */
+function endGame(reason){
+  if(endGameCalled) return;                 /* strict single-run guard */
+  endGameCalled = true;
+  gameRunning = false;
+
+  if(animationID){ cancelAnimationFrame(animationID); animationID = null; }
+  keys.left = keys.right = keys.fire = false;
+  objects = []; particles = []; floatingTexts = [];
+  resetFuryUI();
+
+  /* personal best per mission — storage may be blocked, never let it stop the results screen */
+  const key = "fireFury_" + gameType;
+  let old = 0;
+  try{ old = Number(localStorage.getItem(key) || 0) || 0; }catch(e){ old = 0; }
+  const best = Math.max(old, score);
+  try{ localStorage.setItem(key, String(best)); }catch(e){}
+
+  saveCompletedRun(reason);
+
+  if(window.ffMultiplayerGame && ffMatch.channel){
+    ffMatch.localDone = true;
+    const donePayload = {kind:"done", userId:ffUser.id, score:Number(score)||0, bestCombo:Number(bestCombo)||0, mission:gameType};
+    mpSend(donePayload);
+    setTimeout(() => mpSend(donePayload), 1500);          /* resend once in case the first broadcast was dropped */
+    setTimeout(() => { if(!ffMatch.opponentDone){ ffMatch.opponentGone = true; renderMultiplayerResult(); } }, 90000);
+  }
+
+  const totals = getDisplayTotals();
+  $("resultCareerTotal").textContent = totals.totalPoints;
+  $("resultMatchesTotal").textContent = totals.matches;
+  updateHeader();
+
+  $("resultScore").textContent = score;
+  $("resultPoints").textContent = score;
+  $("resultBest").textContent = best;
+  $("resultCombo").textContent = bestCombo;
+
+  $("resultTitle").textContent =
+      score >= 5000 ? "🔥 LEGENDARY RUN!"
+    : score >= 3000 ? "⚡ FANTASTIC RUN!"
+    : score >= 1500 ? "🚀 STRONG RUN!"
+    :                 "📚 KEEP TRAINING!";
+
+  let reasonText;
+  if(reason === "LIVES"){ playSfx('defeat'); reasonText = "💥 You ran out of lives. The hazards finally got you."; }
+  else { playSfx('victory'); reasonText = "⏱️ Time's up! You survived the mission timer."; }
+
+  let goalText = "";
+  if(gameType === "volcano"){
+    goalText = score >= VOLCANO_GOAL
+      ? "<br>🎯 Goal reached: you scored " + VOLCANO_GOAL.toLocaleString() + "+ points!"
+      : "<br>🎯 Goal: " + VOLCANO_GOAL.toLocaleString() + " points — you needed " + (VOLCANO_GOAL - score).toLocaleString() + " more.";
+  }
+
+  const outro =
+      gameType === "volcano"
+        ? "🌋 Now connect what you played to your physical volcano models. Explain Hawaiian, Strombolian, Vulcanian and Plinian eruptions to your visitor."
+    : gameType === "rocket"
+        ? "🚀 Now show your V-2 missile model and explain how a liquid-fuel, guided rocket works — and why the V-2 is a landmark in rocket history."
+    :   "🔥 You completed the combined FIRE & FURY challenge. Now challenge your visitor to explain both halves of the exhibition.";
+
+  $("resultNotice").innerHTML = reasonText + goalText + "<br><br>" + outro;
+
+  show("results");
+  if(window.ffMultiplayerGame) renderMultiplayerResult();
+}
+
+function renderMultiplayerResult(){
+  if(!ffMatch.id) return;
+  const el = $("resultNotice"); if(!el) return;
+  $("mpResultBlock")?.remove();
+  const block = document.createElement("div");
+  block.id = "mpResultBlock";
+  block.style.marginTop = "18px";
+  const mine = Number(score) || 0, theirs = Number(ffMatch.opponentScore) || 0;
+
+  if(!ffMatch.opponentDone && ffMatch.opponentGone){
+    block.innerHTML = '<b>⚔️ ONLINE DUEL</b><br>Your opponent did not finish (they may have disconnected).<br><span style="color:#e8c9b5">Your score: ' + mine + ' pts</span>';
+  }else if(!ffMatch.opponentDone){
+    block.innerHTML = '<b>⚔️ ONLINE DUEL</b><br>Waiting for your opponent to finish…<br><span style="color:#e8c9b5">Your score: ' + mine + ' pts</span>';
+  }else{
+    const result = mine > theirs ? "🏆 VICTORY!" : mine < theirs ? "💥 DEFEAT" : "🤝 DRAW!";
+    block.innerHTML = '<div style="font-size:1.25em"><b>' + result + '</b></div><br><b>ONLINE DUEL RESULT</b><br>You: ' + mine + ' pts &nbsp; • &nbsp; Opponent: ' + theirs + ' pts';
+    updateMpBattleBar(result + "  You " + mine + " • Opponent " + theirs);
+  }
+  el.appendChild(block);
+}
+
+function quitGame(){
+  gameRunning = false;
+  endGameCalled = true;                    /* a pending endGame() must not fire after quitting */
+  if(animationID){ cancelAnimationFrame(animationID); animationID = null; }
+  keys.left = keys.right = keys.fire = false;
+  resetFuryUI();
+
+  if(window.ffMultiplayerGame){
+    mpSend({kind:"quit", userId:ffUser?.id});           /* tell the opponent so they are not left waiting */
+    leaveMatch();
+  }
+  window.ffMultiplayerGame = false;
+  show("missions");
+}
+
+/* =====================================================
+   KEYBOARD
+===================================================== */
+function isTypingTarget(t){ return !!t && typeof t.matches === "function" && t.matches("input,textarea,select,[contenteditable='true']"); }
+
+document.addEventListener("keydown", e => {
+  if(isTypingTarget(e.target) || !e.key) return;          /* never hijack typing (e.g. Space in a username) */
+  const k = e.key.toLowerCase();
+  if(e.key === "ArrowLeft" || k === "a") keys.left = true;
+  if(e.key === "ArrowRight" || k === "d") keys.right = true;
+  if(e.code === "Space"){
+    keys.fire = true;
+    if(gameRunning) e.preventDefault();                   /* only block page scroll while playing */
+  }
+});
+
+document.addEventListener("keyup", e => {
+  if(!e.key) return;
+  const k = e.key.toLowerCase();
+  if(e.key === "ArrowLeft" || k === "a") keys.left = false;
+  if(e.key === "ArrowRight" || k === "d") keys.right = false;
+  if(e.code === "Space") keys.fire = false;
+});
+
+function releaseAllKeys(){ keys.left = keys.right = keys.fire = false; }
+window.addEventListener("blur", releaseAllKeys);
+document.addEventListener("visibilitychange", () => { if(document.hidden) releaseAllKeys(); });
+
+/* =====================================================
+   MOBILE HUD CONTROLS
+   FIRE = bottom-left button, JOYSTICK = bottom-right, horizontal only
+===================================================== */
+const moveJoystick = $("moveJoystick");
+const joystickThumb = $("joystickThumb");
+let joystickPointerId = null;
+
+function resetJoystick(){
+  keys.left = false; keys.right = false;
+  if(joystickThumb) joystickThumb.style.transform = "translate(-50%,-50%)";
+}
+
+function updateJoystick(clientX){
+  if(!moveJoystick || !joystickThumb) return;
+  const rect = moveJoystick.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const maxTravel = Math.max(18, rect.width / 2 - joystickThumb.offsetWidth / 2 - 8);
+  const dx = Math.max(-maxTravel, Math.min(maxTravel, clientX - centerX));
+  const deadZone = Math.max(10, maxTravel * .12);
+  keys.left = dx < -deadZone;
+  keys.right = dx > deadZone;
+  joystickThumb.style.transform = `translate(calc(-50% + ${dx}px),-50%)`;
+}
+
+if(moveJoystick){
+  moveJoystick.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    joystickPointerId = e.pointerId;
+    try{ moveJoystick.setPointerCapture(e.pointerId); }catch(_){}
+    updateJoystick(e.clientX);
+  }, {passive:false});
+
+  moveJoystick.addEventListener("pointermove", e => {
+    if(e.pointerId !== joystickPointerId) return;
+    e.preventDefault();
+    updateJoystick(e.clientX);
+  }, {passive:false});
+
+  const releaseJoystick = e => {
+    if(joystickPointerId !== null && e.pointerId !== undefined && e.pointerId !== joystickPointerId) return;
+    joystickPointerId = null;
+    resetJoystick();
+  };
+  moveJoystick.addEventListener("pointerup", releaseJoystick);
+  moveJoystick.addEventListener("pointercancel", releaseJoystick);
+  moveJoystick.addEventListener("lostpointercapture", releaseJoystick);
+}
+
+function holdFire(element){
+  if(!element) return;
+  element.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    keys.fire = true;
+    try{ element.setPointerCapture(e.pointerId); }catch(_){}
+  }, {passive:false});
+  const release = e => { e.preventDefault(); keys.fire = false; };
+  element.addEventListener("pointerup", release, {passive:false});
+  element.addEventListener("pointercancel", release, {passive:false});
+  element.addEventListener("lostpointercapture", () => { keys.fire = false; });
+}
+holdFire($("fireBtn"));
+
+/* =====================================================
+   ACCOUNTS (Supabase)
+===================================================== */
+function multiplayerBackendReady(){
+  return !!window.supabase && FF_SUPABASE_URL.startsWith("https://") &&
+         !FF_SUPABASE_URL.includes("YOUR_") && !FF_SUPABASE_KEY.includes("YOUR_");
+}
+
+async function ensureSupabaseClient(){
+  if(!window.supabase || typeof window.supabase.createClient !== "function")
+    throw new Error("The online library did not load. Check your internet connection and reload the page.");
+  if(!FF_SUPABASE_URL.startsWith("https://") || FF_SUPABASE_URL.includes("YOUR_") || FF_SUPABASE_KEY.includes("YOUR_"))
+    throw new Error("Online services are not configured.");
+  if(!ffSupabase){
+    ffSupabase = window.supabase.createClient(FF_SUPABASE_URL, FF_SUPABASE_KEY, {
+      auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true}
+    });
+  }
+  return ffSupabase;
+}
+
+function canPlayFuryGame(){ return !!ffUser?.id && !ffUser.is_anonymous; }
+
+function setAuthStatus(t){ const el = $("authStatus"); if(el) el.textContent = t; }
+
+function setAuthView(view){
+  $("authLoginForm")?.toggleAttribute("hidden", view !== "login");
+  $("authSignupForm")?.toggleAttribute("hidden", view !== "signup");
+  $("authRecoveryForm")?.toggleAttribute("hidden", view !== "recovery");
+}
+function showAuthLogin(){
+  setAuthView("login");
+  $("authTitle").textContent = "🔥 FIRE & FURY LOGIN";
+  $("authSubtitle").textContent = "Log in to continue to your FIRE & FURY player account.";
+  setAuthStatus("Enter your email and password.");
+}
+function showAuthSignup(){
+  setAuthView("signup");
+  $("authTitle").textContent = "🔥 CREATE FIRE & FURY ACCOUNT";
+  $("authSubtitle").textContent = "Your account keeps your player identity ready for multiplayer and online scores.";
+  setAuthStatus("Use a real email address you can access if email confirmation is enabled.");
+}
+function showAuthRecovery(){
+  $("authModal")?.classList.add("show");
+  setAuthView("recovery");
+  $("authTitle").textContent = "🔑 CHOOSE A NEW PASSWORD";
+  $("authSubtitle").textContent = "Enter a new password for your FIRE & FURY account.";
+  setAuthStatus("Your password reset link worked — choose a new password.");
+}
+function openAuthGate(){
+  if(canPlayFuryGame()){ finishAuthenticatedEntry(); return; }      /* already logged in */
+  $("authModal")?.classList.add("show");
+  showAuthLogin();
+}
+function closeAuthGate(){ $("authModal")?.classList.remove("show"); }
+
+/* Tapping the dark backdrop closes the popup; taps inside the card don't. */
+(function installAuthOutsideClose(){
+  const modal = $("authModal");
+  const card = modal?.querySelector(".ff-modal-card");
+  if(!modal || !card) return;
+  modal.addEventListener("pointerdown", e => {
+    if(modal.classList.contains("show") && !card.contains(e.target)) closeAuthGate();
+  });
+})();
+
+async function syncAuthenticatedProfile(user, preferredUsername){
+  const metadataName = String(user?.user_metadata?.username || preferredUsername || "Player").trim();
+  const cleanName = (metadataName || "Player").replace(/\s+/g, " ").slice(0, 24);
+  let onlineProfile = null;
+  try{
+    const {data:existing, error:lookupError} = await ffSupabase.from("profiles").select("username,avatar").eq("id", user.id).maybeSingle();
+    if(lookupError) throw lookupError;
+    onlineProfile = existing;
+  }catch(e){ console.warn("Profile lookup", e); }
+
+  activePlayer = onlineProfile?.username || cleanName || "Player";
+  if(onlineProfile?.avatar){ finalAvatar = onlineProfile.avatar; loadFinalAvatarImage(finalAvatar); }
+
+  const {error:profileError} = await ffSupabase.from("profiles").upsert(
+    {id:user.id, username:activePlayer, avatar:finalAvatar}, {onConflict:"id"}
+  );
+  if(profileError) throw new Error("Profile sync failed: " + profileError.message);
+
+  ffUser = user;
+  onlineTotals = null;
+  renderPlayerHistory();
+  updateHeader();
+  refreshOnlineTotals();
+}
+
+async function finishAuthenticatedEntry(){
+  if(!ffUser?.id) return false;
+  closeAuthGate();
+  $("startScreen")?.classList.add("hidden");
+  show("home");
+  setTimeout(() => subscribeMultiplayerRequests(), 0);
+  setTimeout(() => setMpStatus("🟢 Online as " + activePlayer + ". You can send a challenge request."), 0);
+  return true;
+}
+
+/* LIKE patterns treat % and _ as wildcards — escape them so names match literally. */
+function escapeLike(s){ return String(s).replace(/[\\%_]/g, "\\$&"); }
+
+async function usernameTaken(name){
+  try{
+    const {data, error} = await ffSupabase.from("profiles").select("id").ilike("username", escapeLike(name)).limit(1);
+    if(error) throw error;
+    return (data || []).length > 0;
+  }catch(e){ console.warn("Username check skipped", e); return false; }
+}
+
+async function loginFuryAccount(){
+  try{
+    await ensureSupabaseClient();
+    const email = ($("authLoginEmail")?.value || "").trim().toLowerCase();
+    const password = $("authLoginPassword")?.value || "";
+    if(!email || !password){ setAuthStatus("📧 Enter your email and 🔑 password."); return; }
+    setAuthStatus("🔥 Logging you in…");
+    const {data, error} = await ffSupabase.auth.signInWithPassword({email, password});
+    if(error) throw error;
+    if(!data?.user) throw new Error("Login succeeded but no player account was returned.");
+    await syncAuthenticatedProfile(data.user);
+    await finishAuthenticatedEntry();
+  }catch(e){
+    setAuthStatus("❌ " + (e?.message || e));
+    console.warn("FIRE & FURY login error", e);
+  }
+}
+
+async function createFuryAccount(){
+  try{
+    await ensureSupabaseClient();
+    const username = ($("authSignupUsername")?.value || "").trim().replace(/\s+/g, " ").slice(0, 24);
+    const email = ($("authSignupEmail")?.value || "").trim().toLowerCase();
+    const password = $("authSignupPassword")?.value || "";
+    const confirm = $("authSignupConfirm")?.value || "";
+    if(username.length < 2){ setAuthStatus("👤 Player name must be at least 2 characters."); return; }
+    if(/[*%\\]/.test(username)){ setAuthStatus("👤 Player names can't contain * % or \\ characters."); return; }
+    if(!email || !email.includes("@")){ setAuthStatus("📧 Enter a valid email address."); return; }
+    if(password.length < 6){ setAuthStatus("🔑 Password must be at least 6 characters."); return; }
+    if(password !== confirm){ setAuthStatus("🔑 Passwords do not match."); return; }
+    setAuthStatus("🔎 Checking that the player name is free…");
+    if(await usernameTaken(username)){ setAuthStatus("👤 That player name is already taken. Please choose another."); return; }
+    setAuthStatus("🚀 Creating your FIRE & FURY account…");
+    const {data, error} = await ffSupabase.auth.signUp({email, password, options:{data:{username}}});
+    if(error) throw error;
+    if(data?.session?.user){
+      await syncAuthenticatedProfile(data.session.user, username);
+      await finishAuthenticatedEntry();
+      setAuthStatus("🔥 Account created!");
+    }else{
+      showAuthLogin();
+      const emailBox = $("authLoginEmail"); if(emailBox) emailBox.value = email;
+      setAuthStatus("📧 Account created. Check your email to confirm the account, then log in here.");
+    }
+  }catch(e){
+    setAuthStatus("❌ " + (e?.message || e));
+    console.warn("FIRE & FURY signup error", e);
+  }
+}
+
+async function sendFuryPasswordReset(){
+  try{
+    await ensureSupabaseClient();
+    const email = ($("authLoginEmail")?.value || "").trim().toLowerCase();
+    if(!email){ setAuthStatus("📧 Enter your email first, then choose Forgot password."); return; }
+    setAuthStatus("📨 Sending password reset email…");
+    const {error} = await ffSupabase.auth.resetPasswordForEmail(email, {redirectTo: window.location.origin + window.location.pathname});
+    if(error) throw error;
+    setAuthStatus("📨 If that email is registered, a password reset link has been sent.");
+  }catch(e){ setAuthStatus("❌ " + (e?.message || e)); }
+}
+
+async function updateRecoveryPassword(){
+  try{
+    await ensureSupabaseClient();
+    const pw = $("authNewPassword")?.value || "";
+    const confirm = $("authNewPasswordConfirm")?.value || "";
+    if(pw.length < 6){ setAuthStatus("🔑 Password must be at least 6 characters."); return; }
+    if(pw !== confirm){ setAuthStatus("🔑 Passwords do not match."); return; }
+    setAuthStatus("💾 Saving your new password…");
+    const {data, error} = await ffSupabase.auth.updateUser({password:pw});
+    if(error) throw error;
+    try{ history.replaceState(null, "", window.location.pathname); }catch(_){}
+    if(data?.user){
+      await syncAuthenticatedProfile(data.user);
+      await finishAuthenticatedEntry();
+    }
+    setAuthStatus("✅ Password updated.");
+  }catch(e){ setAuthStatus("❌ " + (e?.message || e)); }
+}
+
+async function logoutFuryAccount(){
+  if(!ffSupabase) return;
+  try{ await ffSupabase.auth.signOut(); }catch(e){ console.warn(e); }
+  leaveMatch();
+  ffUser = null; onlineTotals = null;
+  activePlayer = "Guest"; finalAvatar = "🌋"; finalAvatarImage = null;
+  if(ffRequestChannel){ try{ await ffSupabase.removeChannel(ffRequestChannel); }catch(_){} ffRequestChannel = null; }
+  const pw = $("authLoginPassword"); if(pw) pw.value = "";
+  closeAuthGate();
+  show("home");
+  renderPlayerHistory();
+  updateHeader();
+  setAuthStatus("🚪 Logged out. You can explore FIRE & FURY, but a login or signup is required to start a game.");
+}
+
+async function deleteFuryAccount(){
+  if(!ffSupabase || !ffUser){ alert("No FIRE & FURY account is currently signed in."); return; }
+  const username = activePlayer || ffUser.user_metadata?.username || "this player";
+  const confirmed = confirm(`DELETE means DELETE.\n\nThis permanently deletes the FIRE & FURY account for "${username}" and its online profile, scores, match data and avatar. You will be logged out and this cannot be undone.\n\nChoose Cancel if you only want to log out.`);
+  if(!confirmed) return;
+  try{
+    const {error} = await ffSupabase.rpc("delete_my_account");
+    if(error) throw error;
+    const profiles = safeReadProfiles();
+    delete profiles[activePlayer];
+    safeWriteProfiles(profiles);
+    leaveMatch();
+    if(ffRequestChannel){ try{ await ffSupabase.removeChannel(ffRequestChannel); }catch(_){} ffRequestChannel = null; }
+    try{ await ffSupabase.auth.signOut(); }catch(_){}
+    ffUser = null; onlineTotals = null;
+    activePlayer = "Guest"; finalAvatar = "🌋"; finalAvatarImage = null;
+    show("home");
+    renderPlayerHistory();
+    $("startScreen")?.classList.remove("hidden");
+    setAuthStatus("🗑️ Account permanently deleted. You can create a new FIRE & FURY account anytime.");
+  }catch(e){
+    console.error("FIRE & FURY account deletion failed", e);
+    alert("Account was NOT deleted.\n\n" + (e?.message || e));
+  }
+}
+
+function installAuthListener(){
+  if(!ffSupabase) return;
+  ffSupabase.auth.onAuthStateChange((event) => {
+    if(event === "SIGNED_OUT"){ ffUser = null; onlineTotals = null; }
+    if(event === "PASSWORD_RECOVERY") setTimeout(showAuthRecovery, 0);   /* user followed the reset-email link */
+  });
+}
+
+/* Startup: restore a saved session (the start screen stays visible; "Login" then skips the form). */
+(async () => {
+  try{
+    await ensureSupabaseClient();
+    installAuthListener();
+    if(window.location.hash.includes("type=recovery")) setTimeout(showAuthRecovery, 300);
+    const {data} = await ffSupabase.auth.getSession();
+    const user = data?.session?.user;
+    if(user){
+      if(user.is_anonymous){
+        try{ await ffSupabase.auth.signOut(); }catch(e){ console.warn("Anonymous session cleanup", e); }
+        ffUser = null; activePlayer = "Player";
+      }else{
+        await syncAuthenticatedProfile(user);
+        subscribeMultiplayerRequests();
+      }
+    }
+  }catch(e){}
+})();
+
+/* =====================================================
+   ONLINE MULTIPLAYER
+===================================================== */
+function setMpStatus(t){ const el = $("mpStatus"); if(el) el.textContent = t; }
+
+let ffMatch = {id:null, rawChannel:null, channel:null, ready:false, opponentReady:false, opponentScore:0, opponentCombo:0, opponentDone:false, opponentGone:false, localDone:false, mission:null, opponentMission:null};
+let ffLastBroadcast = 0;
+const ffWaitingIds = new Set();
+
+async function initMultiplayerBackend(){
+  if(!multiplayerBackendReady()){ setMpStatus("⚠️ Multiplayer is not available right now (online library not loaded)."); return false; }
+  try{
+    await ensureSupabaseClient();
+    const sessionResult = await ffSupabase.auth.getSession();
+    if(sessionResult.error) throw sessionResult.error;
+    const session = sessionResult.data?.session || null;
+    if(!session?.user?.id){ setMpStatus("🔐 Please log in or create a FIRE & FURY account first."); return false; }
+    if(session.user.is_anonymous){ setMpStatus("🔐 This game uses real FIRE & FURY accounts. Please log in or create one."); return false; }
+    if(!ffUser?.id) await syncAuthenticatedProfile(session.user, activePlayer);
+    await subscribeMultiplayerRequests();
+    setMpStatus("🟢 Online as " + activePlayer + ". You can send a challenge request.");
+    return true;
+  }catch(e){
+    setMpStatus("❌ Online setup error: " + String(e?.message || e || "Unknown error"));
+    console.warn("FIRE & FURY Supabase setup error", e);
+    return false;
+  }
+}
+
+async function openMultiplayer(){
+  $("multiplayerModal")?.classList.add("show");
+  if(await initMultiplayerBackend()) loadPendingRequest();
+}
+function closeMultiplayer(){ $("multiplayerModal")?.classList.remove("show"); }
+
+async function sendMultiplayerRequest(){
+  const opponent = ($("mpOpponent")?.value || "").trim().replace(/\s+/g, " ").slice(0, 24);
+  if(!opponent){ setMpStatus("Enter the other player's username first."); return; }
+  if(/[*]/.test(opponent)){ setMpStatus("❌ That username is not registered online."); return; }
+  if(!await initMultiplayerBackend()) return;
+  try{
+    const {data:found, error:findError} = await ffSupabase.from("profiles").select("id,username").ilike("username", escapeLike(opponent)).limit(1);
+    if(findError) throw findError;
+    const target = found && found[0];
+    if(!target){ setMpStatus("❌ That username is not registered online."); return; }
+    if(target.id === ffUser.id){ setMpStatus("Choose another player."); return; }
+    const {data:req, error} = await ffSupabase.from("match_requests").insert({from_user:ffUser.id, to_user:target.id, status:"pending"}).select("id").single();
+    if(error) throw error;
+    setMpStatus("📨 Request sent to " + target.username + ". Waiting for acceptance…");
+    waitForAcceptedMatch(req?.id);       /* database fallback in case a Realtime UPDATE is missed */
+  }catch(e){ setMpStatus("❌ Could not send request: " + (e.message || e)); }
+}
+
+async function subscribeMultiplayerRequests(){
+  if(!ffSupabase || !ffUser) return;
+  if(ffRequestChannel){
+    try{ await ffSupabase.removeChannel(ffRequestChannel); }catch(_){}
+    ffRequestChannel = null;
+  }
+  ffRequestChannel = ffSupabase.channel("ff-requests-" + ffUser.id)
+    .on("postgres_changes", {event:"INSERT", schema:"public", table:"match_requests", filter:"to_user=eq." + ffUser.id}, payload => {
+      showIncomingRequest(payload.new);
+      if(!gameRunning) $("multiplayerModal")?.classList.add("show");     /* make sure the player actually sees it */
+    })
+    .on("postgres_changes", {event:"UPDATE", schema:"public", table:"match_requests", filter:"from_user=eq." + ffUser.id}, payload => {
+      if(payload.new.status === "accepted"){
+        setMpStatus("✅ Your opponent accepted! Opening the match room…");
+        waitForAcceptedMatch(payload.new.id);
+      }
+    })
+    .subscribe(status => {
+      if(status === "SUBSCRIBED") console.log("FIRE & FURY request channel connected");
+      if(status === "CHANNEL_ERROR" || status === "TIMED_OUT") setMpStatus("⚠️ Realtime is unavailable. Check Supabase Realtime/RLS settings.");
+    });
+}
+
+/* One polling loop per request id — Realtime and the sender both call this. */
+async function waitForAcceptedMatch(requestId){
+  if(!requestId || !ffSupabase || !ffUser || ffWaitingIds.has(requestId)) return;
+  ffWaitingIds.add(requestId);
+  try{
+    const started = Date.now(), timeout = 120000;
+    let lastStatus = "pending";
+    while(Date.now() - started < timeout){
+      try{
+        const {data:req, error:reqError} = await ffSupabase.from("match_requests").select("id,status").eq("id", requestId).maybeSingle();
+        if(reqError) throw reqError;
+        if(req?.status && req.status !== lastStatus){
+          lastStatus = req.status;
+          if(req.status === "accepted") setMpStatus("✅ Opponent accepted! Opening the match room…");
+          if(req.status === "declined"){ setMpStatus("❌ Your opponent declined the request."); return; }
+        }
+        if(req?.status === "accepted"){
+          const {data:mp, error:mpError} = await ffSupabase.from("matches").select("id")
+            .eq("created_by", ffUser.id).eq("status", "active")
+            .order("created_at", {ascending:false}).limit(1).maybeSingle();
+          if(mpError) throw mpError;
+          if(mp?.id){
+            await enterOnlineMatch(mp.id);
+            const inc = $("mpIncoming");
+            if(inc) inc.innerHTML = '<b>✅ Opponent accepted!</b><div class="ff-row">Choose the mission below, then press READY.</div>';
+            updateMpReadyButton();
+            return;
+          }
+        }
+      }catch(e){ console.warn("FIRE & FURY match polling", e); }
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+    setMpStatus("⌛ The request timed out. Send a new one if you still want to play.");
+  } finally { ffWaitingIds.delete(requestId); }
+}
+
+async function loadPendingRequest(){
+  try{
+    const {data, error} = await ffSupabase.from("match_requests").select("id,from_user")
+      .eq("to_user", ffUser.id).eq("status", "pending").order("created_at", {ascending:false}).limit(1);
+    if(error) throw error;
+    if(data && data[0]) showIncomingRequest(data[0]);
+    else { const el = $("mpIncoming"); if(el) el.textContent = "No incoming requests."; }
+  }catch(e){ console.warn("Pending request lookup", e); }
+}
+
+async function showIncomingRequest(req){
+  const el = $("mpIncoming"); if(!el || !req) return;
+  let name = "A player";
+  try{
+    const {data} = await ffSupabase.from("profiles").select("username").eq("id", req.from_user).maybeSingle();
+    if(data?.username) name = data.username;
+  }catch(_){}
+  el.textContent = "";
+  const msg = document.createElement("span");
+  msg.innerHTML = "⚔️ <b>" + escapeHistoryText(name) + "</b> challenged you. ";
+  const accept = document.createElement("button");
+  accept.className = "btn"; accept.type = "button"; accept.textContent = "Accept";
+  accept.addEventListener("click", () => acceptMultiplayerRequest(req.id));
+  const decline = document.createElement("button");
+  decline.className = "btn"; decline.type = "button"; decline.textContent = "Decline";
+  decline.addEventListener("click", () => declineMultiplayerRequest(req.id));
+  el.append(msg, accept, decline);
+}
+
+async function acceptMultiplayerRequest(id){
+  if(!ffSupabase){ setMpStatus("Online backend is not connected."); return; }
+  const {data, error} = await ffSupabase.rpc("respond_to_match_request", {p_request_id:id, p_accept:true});
+  if(error){ setMpStatus("❌ " + error.message); return; }
+  if(data){
+    await enterOnlineMatch(data);
+    const inc = $("mpIncoming");
+    if(inc) inc.innerHTML = '<b>✅ Request accepted. Match room created.</b><div class="ff-row">Choose the mission below, then press READY.</div>';
+    updateMpReadyButton();
+  }
+}
+
+async function declineMultiplayerRequest(id){
+  if(!ffSupabase){ setMpStatus("Online backend is not connected."); return; }
+  const {error} = await ffSupabase.rpc("respond_to_match_request", {p_request_id:id, p_accept:false});
+  if(error) setMpStatus("❌ " + error.message);
+  else $("mpIncoming").textContent = "Request declined.";
+}
+
+function missionLabel(type){
+  return type === "volcano" ? "🌋 VOLCANO RUSH" : type === "rocket" ? "🚀 ROCKET BATTLE" : "🔥 FINAL FURY";
+}
+
+function selectOnlineMission(type, announce=true){
+  if(!["volcano","rocket","final"].includes(type)) return;
+  if(ffMatch.opponentMission && ffMatch.opponentMission !== type){
+    setMpStatus("⚠️ Your opponent already selected " + missionLabel(ffMatch.opponentMission) + ". Both players must use the same mission.");
+    return;
+  }
+  ffMatch.mission = type;
+  const st = $("mpMissionStatus"); if(st) st.textContent = "Selected: " + missionLabel(type);
+  if(announce && ffMatch.channel) mpSend({kind:"mission", userId:ffUser.id, mission:type});
+  updateMpReadyButton();
+}
+
+function updateMpReadyButton(){
+  const rr = $("mpReadyRow"); if(!rr) return;
+  if(!ffMatch.channel){ rr.innerHTML = ""; return; }
+  if(!ffMatch.mission){ rr.innerHTML = '<span style="color:#f0cdb0">🎮 Choose a mission first.</span>'; return; }
+  if(ffMatch.opponentMission && ffMatch.opponentMission !== ffMatch.mission){
+    rr.innerHTML = '<span style="color:#ffb58d">⚠️ Waiting for the same mission on both devices.</span>'; return;
+  }
+  rr.innerHTML = '<button class="btn gold" type="button" onclick="startMultiplayerReady()">🔥 READY FOR ' + missionLabel(ffMatch.mission) + '</button>';
+}
+
+async function leaveMatch(){
+  const ch = ffMatch.rawChannel;
+  ffMatch = {id:null, rawChannel:null, channel:null, ready:false, opponentReady:false, opponentScore:0, opponentCombo:0, opponentDone:false, opponentGone:false, localDone:false, mission:null, opponentMission:null};
+  if(ch && ffSupabase){ try{ await ffSupabase.removeChannel(ch); }catch(_){} }
+}
+
+async function enterOnlineMatch(matchId){
+  if(!ffSupabase || !ffUser){ setMpStatus("❌ Multiplayer session is not ready."); return; }
+  if(ffMatch.id === matchId && ffMatch.rawChannel) return;           /* already in this room */
+  await leaveMatch();                                                /* never keep two channels open */
+  ffMatch.id = matchId;
+  setMpStatus("⚔️ Match found. Both players must press READY.");
+
+  const ch = ffSupabase.channel("ff-match-" + matchId);
+  ffMatch.rawChannel = ch;
+  ch.on("broadcast", {event:"match_event"}, payload => handleRemoteGameEvent(payload.payload)).subscribe(status => {
+    if(status === "SUBSCRIBED"){
+      ffMatch.channel = ch;
+      updateMpBattleBar("🟡 Waiting for both players…");
+      ch.send({type:"broadcast", event:"match_event", payload:{kind:"hello", userId:ffUser.id, username:activePlayer, mission:ffMatch.mission}});
+      setMpStatus("🟢 Match room connected. Press READY to start.");
+      updateMpReadyButton();
+    }
+  });
+}
+
+function updateMpBattleBar(text){
+  const el = $("mpBattleBar");
+  if(el){ el.textContent = text; el.classList.add("show"); }
+}
+
+async function mpSend(payload){
+  if(!ffMatch.channel) return;
+  try{ await ffMatch.channel.send({type:"broadcast", event:"match_event", payload}); }
+  catch(e){ console.warn("Multiplayer send failed", e); }
+}
+
+async function startMultiplayerReady(){
+  if(!ffMatch.id || !ffMatch.channel){ setMpStatus("Connect to the match room first."); return; }
+  if(!ffMatch.mission){ setMpStatus("🎮 Choose a mission before pressing READY."); return; }
+  if(ffMatch.opponentMission && ffMatch.opponentMission !== ffMatch.mission){ setMpStatus("⚠️ Both players must choose the same mission."); return; }
+  ffMatch.ready = true;
+  await mpSend({kind:"ready", userId:ffUser.id, username:activePlayer, avatar:finalAvatar, mission:ffMatch.mission});
+  setMpStatus(ffMatch.opponentReady ? "🔥 Both ready — battle starting!" : "🟡 Ready. Waiting for your opponent…");
+  if(ffMatch.opponentReady && ffMatch.mission === ffMatch.opponentMission) launchMultiplayerBattle();
+}
+
+function launchMultiplayerBattle(){
+  if(!ffMatch.mission || (ffMatch.opponentMission && ffMatch.opponentMission !== ffMatch.mission)){
+    setMpStatus("⚠️ Mission selection is not synchronized yet."); return;
+  }
+  closeMultiplayer();
+  updateMpBattleBar("⚔️ ONLINE DUEL • " + missionLabel(ffMatch.mission) + " • Opponent score: 0");
+  startGame(ffMatch.mission, true);
+}
+
+function handleRemoteGameEvent(event){
+  if(!event || !ffMatch.id || event.userId === ffUser?.id) return;
+
+  if(event.kind === "hello"){
+    if(event.mission && ["volcano","rocket","final"].includes(event.mission) && !ffMatch.mission){
+      ffMatch.mission = event.mission;
+      ffMatch.opponentMission = event.mission;
+      const st = $("mpMissionStatus"); if(st) st.textContent = "Opponent selected: " + missionLabel(event.mission);
+      updateMpReadyButton();
+    }
+    if(ffMatch.ready) mpSend({kind:"ready", userId:ffUser.id, username:activePlayer, avatar:finalAvatar, mission:ffMatch.mission});
+    return;
+  }
+
+  if(event.kind === "mission"){
+    if(!["volcano","rocket","final"].includes(event.mission)) return;
+    ffMatch.opponentMission = event.mission;
+    if(!ffMatch.mission) ffMatch.mission = event.mission;
+    const st = $("mpMissionStatus");
+    if(st) st.textContent = "Opponent selected: " + missionLabel(event.mission);
+    if(ffMatch.mission !== event.mission){
+      ffMatch.ready = false;
+      setMpStatus("⚠️ Opponent chose " + missionLabel(event.mission) + ". Select the same mission to continue.");
+    }
+    updateMpReadyButton();
+  }
+
+  if(event.kind === "ready"){
+    ffMatch.opponentReady = true;
+    if(event.mission) ffMatch.opponentMission = event.mission;
+    if(!ffMatch.mission && event.mission) ffMatch.mission = event.mission;
+    updateMpReadyButton();
+    setMpStatus(ffMatch.ready && ffMatch.mission === ffMatch.opponentMission ? "🔥 Both ready — battle starting!" : "🟡 Opponent is ready. Press READY to join.");
+    updateMpBattleBar("🟡 Opponent ready • " + (ffMatch.mission ? missionLabel(ffMatch.mission) : "Choose a mission"));
+    if(ffMatch.ready && ffMatch.mission === ffMatch.opponentMission) launchMultiplayerBattle();
+  }
+
+  if(event.kind === "score"){
+    ffMatch.opponentScore = Number(event.score) || 0;
+    ffMatch.opponentCombo = Number(event.combo) || 0;
+    if(gameRunning && ffMatch.id) updateMpBattleBar(`⚔️ ONLINE DUEL • You: ${score} • Opponent: ${ffMatch.opponentScore} • Combo ${ffMatch.opponentCombo}`);
+  }
+
+  if(event.kind === "done"){
+    ffMatch.opponentDone = true;
+    ffMatch.opponentGone = false;
+    ffMatch.opponentScore = Number(event.score) || 0;
+    if(gameRunning) updateMpBattleBar(`⚔️ Opponent finished: ${ffMatch.opponentScore} pts • Finish your run!`);
+    else { renderMultiplayerResult(); showMultiplayerWinner(); }
+  }
+
+  if(event.kind === "quit"){
+    ffMatch.opponentGone = true;
+    if(gameRunning) updateMpBattleBar("⚠️ Your opponent left the match — finish your run!");
+    else renderMultiplayerResult();
+  }
+}
+
+function showMultiplayerWinner(){
+  if(!ffMatch.id || !ffMatch.localDone || !ffMatch.opponentDone) return;
+  const mine = Number(score) || 0, theirs = Number(ffMatch.opponentScore) || 0;
+  const result = mine > theirs ? "🏆 VICTORY!" : mine < theirs ? "💥 DEFEAT" : "🤝 DRAW!";
+  const el = $("mpBattleBar");
+  if(el) el.textContent = `${result}  You ${mine} • Opponent ${theirs}`;
+}
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+renderPlayerHistory();
+updateHeader();
+</script>
+<script>
+/* FIRE AND FURY UNLEASHED — visual + controls upgrade (add-on) */
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+
+/* ---------- STYLE ---------- */
+const css=`
+body.in-game{touch-action:none;overscroll-behavior:none}
+.game-wrap{border:0;border-radius:0;box-shadow:none;background:radial-gradient(ellipse at 50% 0%,#2e1009,#0b0403 72%);padding:6px 8px calc(8px + env(safe-area-inset-bottom))}
+.game-head{gap:6px}
+.game-stat{padding:5px 12px;border-radius:999px;font-weight:800;letter-spacing:.5px;background:linear-gradient(180deg,rgba(66,26,12,.92),rgba(22,9,6,.92));border:1px solid rgba(255,150,60,.5);box-shadow:0 0 12px rgba(255,100,30,.2),inset 0 1px 0 rgba(255,220,160,.18)}
+#gameCanvas{border:1px solid rgba(255,165,75,.65);border-radius:14px}
+.deck{flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:10px 6px 2px;touch-action:none;user-select:none;-webkit-user-select:none}
+.deck .hud-joystick,.deck .hud-fire{position:relative;inset:auto;left:auto;right:auto;bottom:auto;opacity:1}
+.deck .hud-joystick{width:min(58vw,300px);height:clamp(84px,14vh,120px);border:2px solid rgba(255,170,80,.55);background:linear-gradient(180deg,#2c130a,#130705);box-shadow:inset 0 0 26px rgba(255,100,30,.2),0 6px 22px rgba(0,0,0,.6)}
+.deck .hud-joystick-thumb{width:clamp(56px,11vh,78px);height:clamp(56px,11vh,78px);box-shadow:0 0 18px rgba(255,140,50,.55),0 3px 12px rgba(0,0,0,.5)}
+.deck .hud-fire{width:clamp(92px,16vh,132px);height:clamp(92px,16vh,132px);border:3px solid #ffd58a;background:radial-gradient(circle at 35% 30%,#ff9a3c,#c2260a 70%,#5a0f05);box-shadow:0 0 26px rgba(255,100,30,.7),0 8px 20px rgba(0,0,0,.6),inset 0 0 18px rgba(255,230,160,.35);animation:fxPulse 1.6s ease-in-out infinite}
+.deck .hud-fire:active{transform:scale(.92);filter:brightness(1.25)}
+.deck.nofire{justify-content:center}
+.deck.nofire .hud-joystick{width:min(80vw,340px)}
+@keyframes fxPulse{50%{box-shadow:0 0 44px rgba(255,130,40,.95),0 8px 20px rgba(0,0,0,.6),inset 0 0 18px rgba(255,230,160,.35)}}
+@media (orientation:portrait){
+ body.in-game .topbar{display:none}
+ .game-message{display:none}
+ .deck{padding-bottom:2vh}
+}
+@media (max-height:520px){body.in-game .topbar{display:none}}
+@media (orientation:landscape) and (max-height:600px){
+ .game-wrap{display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr) minmax(100px,150px);grid-template-rows:auto auto minmax(0,1fr) auto;column-gap:8px}
+ .game-head{grid-column:1/-1;grid-row:1}
+ #mpBattleBar{grid-column:1/-1;grid-row:2}
+ .stage{grid-column:2;grid-row:3}
+ .deck{display:contents}
+ .deck .hud-joystick{grid-column:1;grid-row:3;align-self:end;justify-self:center;width:100%;max-width:170px;height:84px;margin-bottom:6px}
+ .deck .hud-fire{grid-column:3;grid-row:3;align-self:end;justify-self:center;margin-bottom:6px}
+ .game-actions{grid-column:1/-1;grid-row:4}
+ .game-actions .btn{padding:5px 14px;margin:2px}
+}
+.how-sec{margin:10px 0;padding:10px 12px;border:1px solid rgba(255,170,80,.28);border-radius:12px;background:rgba(30,12,7,.7);line-height:1.5;font-size:.95rem;text-align:left}
+.how-sec b{color:#ffd16b}
+`;
+const st=document.createElement("style");st.textContent=css;document.head.appendChild(st);
+
+const vp=document.querySelector("meta[name=viewport]");
+if(vp)vp.content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover";
+
+/* ---------- CONTROLS UNDER THE CANVAS (move: left hand, fire: right hand) ---------- */
+const oldControls=document.querySelector(".controls");
+const deck=document.createElement("div");
+deck.className="deck";deck.setAttribute("aria-label","Game controls");
+deck.append($("moveJoystick"),$("fireBtn"));
+$("gameMessage").before(deck);
+const si=document.querySelector(".stage-inner");
+si.style.aspectRatio=GAME_W+" / "+GAME_H;
+si.style.width="min(100cqw,calc(100cqh * "+GAME_W+" / "+GAME_H+"))";
+if(oldControls)oldControls.remove();
+
+/* ---------- HOW TO PLAY PANEL ---------- */
+const how=document.createElement("div");
+how.id="howModal";how.className="ff-modal";how.setAttribute("role","dialog");how.setAttribute("aria-modal","true");
+how.innerHTML=`<div class="ff-modal-card"><h2>📖 HOW TO PLAY</h2>
+<div class="how-sec"><b>🎮 Controls</b><br>📱 <b>Left thumb:</b> slide the pad left or right to move.<br>🔥 <b>Right thumb:</b> hold FIRE to shoot.<br>⌨️ <b>Keyboard:</b> ← → or A / D to move, SPACE to fire.</div>
+<div class="how-sec"><b>🌋 Volcano Rush (45s)</b><br>No shooting. Catch 💧 +100, 🔥 +150, 💨 +200, ☁️ +250 and dodge the falling boulders. Reach <b>2,000 points</b>.</div>
+<div class="how-sec"><b>🚀 Rocket Battle (45s)</b><br>You fly a V-2. Shoot 🎯 targets (+200). Scrolls 📜 are worth +500: collect or shoot them.</div>
+<div class="how-sec"><b>🔥 Final Fury (60s)</b><br>Shoot or avoid 💥 enemies and boulders. Collect 📜 and 🔥 for points.</div>
+<div class="how-sec"><b>❤️ Lives</b><br>You have 3 lives. A hit costs a life, breaks your combo and gives a short shield while you flash.</div>
+<div class="how-sec"><b>⚡ Combos &amp; Fury Mode</b><br>Chain hits without getting hurt to build a combo and bonus points. At <b>10 in a row</b> FURY MODE starts: <b>×2 points for 8 seconds</b>.</div>
+<div class="ff-row" style="justify-content:center"><button class="btn gold" type="button" id="howClose">GOT IT 🔥</button></div></div>`;
+document.body.appendChild(how);
+window.openHow=()=>how.classList.add("show");
+window.closeHow=()=>how.classList.remove("show");
+$("howClose").onclick=closeHow;
+how.addEventListener("pointerdown",e=>{if(e.target===how)closeHow()});
+
+function howBtn(){const b=document.createElement("button");b.className="btn";b.type="button";b.textContent="📖 HOW TO PLAY";b.onclick=openHow;return b}
+const ht=document.querySelector(".home-tools");if(ht)ht.prepend(howBtn());
+const sa=document.querySelector(".start-actions");if(sa)sa.append(howBtn());
+const mt=document.querySelector("#missions .section-title");
+if(mt){const w=document.createElement("div");w.style.textAlign="center";w.append(howBtn());mt.after(w)}
+
+/* ---------- VFX ---------- */
+const vfx={flash:0,rgb:"255,60,20",rings:[]};
+const ring=(x,y,rgb,max=90)=>{vfx.rings.push({x,y,r:8,a:1,rgb,max});if(vfx.rings.length>14)vfx.rings.shift()};
+const wrap=(name,fn)=>{const o=window[name];window[name]=function(...a){return fn(o,a)}};
+
+wrap("playerHit",(o,a)=>{const before=lives;const r=o(...a);
+  if(lives<before){vfx.flash=.55;vfx.rgb="255,40,20";ring(player.x,player.y,"255,70,30",130);try{navigator.vibrate&&navigator.vibrate(70)}catch(_){}}
+  return r});
+wrap("destroyTarget",(o,a)=>{const r=o(...a);ring(a[0].x,a[0].y,"255,190,70");try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}return r});
+wrap("collectObject",(o,a)=>{const r=o(...a);ring(a[0].x,a[0].y,"255,235,130",60);return r});
+wrap("startGame",(o,a)=>{const r=o(...a);const f=$("fireBtn");f.style.display=a[0]==="volcano"?"none":"";deck.classList.toggle("nofire",a[0]==="volcano");vfx.rings.length=0;vfx.flash=0;return r});
+
+window.drawBackground=function(){
+  const t=performance.now()/1000;
+  ctx.fillStyle=getBackgroundGradient(gameType);ctx.fillRect(0,0,GAME_W,GAME_H);
+  const col=gameType==="rocket"?"90,120,255":gameType==="volcano"?"255,110,40":"200,70,255";
+  const n=ctx.createRadialGradient(GAME_W*.5+Math.sin(t*.2)*80,GAME_H*.35,20,GAME_W*.5,GAME_H*.35,430);
+  n.addColorStop(0,`rgba(${col},.24)`);n.addColorStop(1,"rgba(0,0,0,0)");
+  ctx.fillStyle=n;ctx.fillRect(0,0,GAME_W,GAME_H);
+  for(let L=0;L<3;L++){
+    ctx.fillStyle=`rgba(255,240,220,${.3+L*.25})`;
+    const sp=18+L*45,sz=1+L*.8;
+    for(let i=0;i<28;i++){
+      const x=(i*173+L*61)%GAME_W,y=((i*83+L*131)%GAME_H+t*sp)%GAME_H;
+      ctx.fillRect(x,y,sz,sz*(1+L*1.5));
+    }
+  }
+  if(gameType==="volcano"){
+    ctx.fillStyle="rgba(255,138,64,.45)";
+    ctx.beginPath();ctx.moveTo(0,GAME_H);ctx.lineTo(180*GAME_W/960,GAME_H*.72);ctx.lineTo(310*GAME_W/960,GAME_H);ctx.fill();
+    ctx.fillStyle="rgba(255,170,80,.4)";
+    ctx.beginPath();ctx.moveTo(580*GAME_W/960,GAME_H);ctx.lineTo(720*GAME_W/960,GAME_H*.67);ctx.lineTo(GAME_W,GAME_H);ctx.fill();
+  }
+  const g=ctx.createLinearGradient(0,GAME_H-120,0,GAME_H);
+  g.addColorStop(0,"rgba(255,90,20,0)");g.addColorStop(1,`rgba(255,90,20,${.28+Math.sin(t*3)*.06})`);
+  ctx.fillStyle=g;ctx.fillRect(0,GAME_H-120,GAME_W,120);
+};
+
+window.drawParticles=function(){
+  ctx.save();ctx.globalCompositeOperation="lighter";
+  particles.forEach(p=>{
+    ctx.globalAlpha=Math.max(0,p.life/p.max)*.9;
+    ctx.fillStyle=p.color;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
+  });
+  ctx.restore();ctx.globalAlpha=1;
+};
+
+function vignette(rgb,a){
+  const g=ctx.createRadialGradient(GAME_W/2,GAME_H/2,GAME_H*.38,GAME_W/2,GAME_H/2,GAME_W*.65);
+  g.addColorStop(0,`rgba(${rgb},0)`);g.addColorStop(1,`rgba(${rgb},${a})`);
+  ctx.fillStyle=g;ctx.fillRect(0,0,GAME_W,GAME_H);
+}
+
+wrap("draw",(o,a)=>{
+  if(gameRunning&&player&&Math.random()<.65&&particles.length<110){
+    particles.push({x:player.x+(Math.random()-.5)*8,y:player.y+26,vx:(Math.random()-.5)*45,vy:110+Math.random()*90,
+      life:.4,max:.4,color:Math.random()<.5?"#ff9a2e":"#ffe27a",size:2+Math.random()*3});
+  }
+  o(...a);
+  if(!player)return;
+  const t=performance.now()/1000;
+  if(furyModeRemaining>0){
+    vignette("255,100,20",.38+Math.sin(t*8)*.08);
+    ctx.save();ctx.strokeStyle="rgba(255,200,120,.28)";ctx.lineWidth=2;
+    for(let i=0;i<14;i++){const x=(i*71+t*600)%GAME_W,y=((i*113)+t*900)%GAME_H;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,y+60);ctx.stroke()}
+    ctx.restore();
+  }
+  if(gameRunning&&lives===1)vignette("255,20,10",.3+Math.sin(t*6)*.12);
+  for(let i=vfx.rings.length-1;i>=0;i--){
+    const r=vfx.rings[i];r.r+=280*.016;r.a-=2.3*.016;
+    if(r.a<=0||r.r>r.max){vfx.rings.splice(i,1);continue}
+    ctx.save();ctx.globalCompositeOperation="lighter";
+    ctx.strokeStyle=`rgba(${r.rgb},${r.a})`;ctx.lineWidth=2+r.a*5;
+    ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,Math.PI*2);ctx.stroke();ctx.restore();
+  }
+  if(vfx.flash>0){ctx.fillStyle=`rgba(${vfx.rgb},${vfx.flash})`;ctx.fillRect(0,0,GAME_W,GAME_H);vfx.flash=Math.max(0,vfx.flash-.035)}
+});
+})();
+
+</script>
+<script>
+/* FIRE AND FURY — Firebase backend (replaces Supabase). Loaded by index.html after the main script. */
+window.ffStartBackend=function(){
+"use strict";
+firebase.initializeApp({
+  apiKey:"AIzaSyDWku-ryArTwVtDbpWkHnmR8j0owLHkZTk",
+  authDomain:"fire-and-fury-unleashed.firebaseapp.com",
+  projectId:"fire-and-fury-unleashed",
+  storageBucket:"fire-and-fury-unleashed.firebasestorage.app",
+  messagingSenderId:"580835069993",
+  appId:"1:580835069993:web:1c626dc5134e9e3ccd0c38"
+});
+const auth=firebase.auth(), db=firebase.firestore();
+const TS=()=>firebase.firestore.FieldValue.serverTimestamp();
+const W=(n,f)=>{window[n]=f};
+const prof=uid=>db.collection("profiles").doc(uid);
+const wrap=u=>({id:u.uid,email:u.email,is_anonymous:false,user_metadata:{username:u.displayName||""}});
+const cn=s=>String(s||"").trim().replace(/\s+/g," ").slice(0,24);
+const err=e=>({"auth/invalid-credential":"Wrong email or password.","auth/email-already-in-use":"That email is already registered.","auth/weak-password":"Password is too weak.","auth/invalid-email":"That email address is not valid.","auth/too-many-requests":"Too many tries. Wait a minute and try again.","auth/requires-recent-login":"Please log out, log back in, then try again."}[e&&e.code]||(e&&e.message)||String(e));
+let unsubReq=null, signingUp=false, lastScoreSend=0;
+const stopReq=()=>{if(unsubReq){unsubReq();unsubReq=null}};
+
+/* ---------- basics ---------- */
+W("multiplayerBackendReady",()=>!!window.firebase);
+W("ensureSupabaseClient",async()=>firebase);
+
+/* ---------- avatars (stored as small images inside Firestore) ---------- */
+W("isAvatarImage",v=>/^data:image\/(jpeg|webp|png);base64,/.test(String(v||""))&&String(v).length<60000);
+W("syncAvatarToProfile",async v=>{if(ffUser&&ffUser.id)prof(ffUser.id).update({avatar:v}).catch(console.warn)});
+W("setPlayerAvatar",function(value,opts){
+  opts=opts||{sync:true};
+  const c=String(value||"").trim(); if(!c)return;
+  finalAvatar=isAvatarImage(c)?c:Array.from(c).slice(0,2).join("");
+  loadFinalAvatarImage(finalAvatar);
+  const ps=safeReadProfiles(), p=ps[activePlayer]||{runs:[]};
+  p.avatar=finalAvatar; ps[activePlayer]=p; safeWriteProfiles(ps);
+  const pv=$("avatarPreview");
+  if(pv)pv.innerHTML="Current avatar: "+(isAvatarImage(finalAvatar)?avatarMarkup(finalAvatar,72):'<span style="font-size:2.2rem">'+escapeHistoryText(finalAvatar)+"</span>");
+  if(opts.sync!==false)syncAvatarToProfile(finalAvatar);
+  refreshOpenPanels();
+});
+W("uploadCustomAvatar",async function(input){
+  const f=input&&input.files&&input.files[0]; if(!f)return;
+  if(!ffUser||!ffUser.id){setAvatarUploadStatus("🔐 Please log in first.");input.value="";return}
+  if(!/^image\//.test(f.type)){setAvatarUploadStatus("❌ Please choose an image.");input.value="";return}
+  try{
+    setAvatarUploadStatus("⏳ Preparing your avatar…");
+    let url="";
+    for(const s of [160,112,80]){
+      const b=await resizeAvatarImage(f,s);
+      url=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(b)});
+      if(url.length<55000)break;
+    }
+    if(url.length>=55000)throw new Error("Image is too large");
+    await prof(ffUser.id).update({avatar:url});
+    setPlayerAvatar(url,{sync:false});
+    setAvatarUploadStatus("✅ Avatar changed successfully.");
+  }catch(e){setAvatarUploadStatus("❌ Avatar upload failed: "+err(e))}
+  finally{input.value=""}
+});
+
+/* ---------- profile, totals, scores, leaderboard ---------- */
+W("syncAuthenticatedProfile",async(user,preferred)=>{
+  const ref=prof(user.id); let d=null;
+  try{const s=await ref.get(); if(s.exists)d=s.data()}catch(e){console.warn("Profile lookup",e)}
+  activePlayer=(d&&d.username)||cn(user.user_metadata.username||preferred)||"Player";
+  if(d&&d.avatar){finalAvatar=d.avatar;loadFinalAvatarImage(finalAvatar)}
+  if(!d)await ref.set({username:activePlayer,usernameLower:activePlayer.toLowerCase(),avatar:finalAvatar,best:0,total:0,games:0});
+  ffUser=user; onlineTotals=null;
+  renderPlayerHistory(); updateHeader(); refreshOnlineTotals();
+});
+W("refreshOnlineTotals",async()=>{
+  if(!ffUser||!ffUser.id)return null;
+  try{
+    const d=(await prof(ffUser.id).get()).data()||{};
+    onlineTotals={totalPoints:d.total||0,matches:d.games||0};
+    updateHeader(); return onlineTotals;
+  }catch(e){console.warn(e);return null}
+});
+const origSave=window.saveCompletedRun;
+W("saveCompletedRun",function(reason){
+  const sc=Math.max(0,Math.min(Number(score)||0,100000)), bc=Math.max(0,Math.min(Number(bestCombo)||0,500)), mode=gameType;
+  origSave(reason);
+  if(!ffUser||!ffUser.id)return;
+  const uid=ffUser.id, ref=prof(uid);
+  db.collection("scores").add({uid,mode,score:sc,bestCombo:bc,createdAt:TS()}).catch(console.warn);
+  db.runTransaction(async t=>{
+    const d=(await t.get(ref)).data()||{};
+    t.update(ref,{best:Math.max(d.best||0,sc),total:(d.total||0)+sc,games:(d.games||0)+1});
+  }).then(()=>refreshOnlineTotals()).catch(console.warn);
+});
+W("fetchOnlineStandings",async()=>{
+  const s=await db.collection("profiles").orderBy("best","desc").limit(50).get();
+  return s.docs.map(d=>{const x=d.data();return{name:x.username,avatar:x.avatar||"🌋",best:x.best||0,total:x.total||0,games:x.games||0}});
+});
+
+/* ---------- accounts ---------- */
+W("loginFuryAccount",async()=>{try{
+  const email=($("authLoginEmail").value||"").trim().toLowerCase(), pw=$("authLoginPassword").value||"";
+  if(!email||!pw){setAuthStatus("📧 Enter your email and 🔑 password.");return}
+  setAuthStatus("🔥 Logging you in…");
+  const c=await auth.signInWithEmailAndPassword(email,pw);
+  await syncAuthenticatedProfile(wrap(c.user));
+  await finishAuthenticatedEntry();
+}catch(e){setAuthStatus("❌ "+err(e))}});
+
+W("createFuryAccount",async()=>{
+  try{
+    const username=cn($("authSignupUsername").value), email=($("authSignupEmail").value||"").trim().toLowerCase();
+    const pw=$("authSignupPassword").value||"", cf=$("authSignupConfirm").value||"";
+    if(username.length<2){setAuthStatus("👤 Player name must be at least 2 characters.");return}
+    if(/[\/*%\\]/.test(username)){setAuthStatus("👤 Player names can't contain / * % or \\ characters.");return}
+    if(!email.includes("@")){setAuthStatus("📧 Enter a valid email address.");return}
+    if(pw.length<6){setAuthStatus("🔑 Password must be at least 6 characters.");return}
+    if(pw!==cf){setAuthStatus("🔑 Passwords do not match.");return}
+    const lower=username.toLowerCase();
+    setAuthStatus("🔎 Checking that the player name is free…");
+    if((await db.collection("usernames").doc(lower).get()).exists){setAuthStatus("👤 That player name is already taken.");return}
+    setAuthStatus("🚀 Creating your account…");
+    signingUp=true;
+    const c=await auth.createUserWithEmailAndPassword(email,pw);
+    try{
+      await c.user.updateProfile({displayName:username});
+      const b=db.batch();
+      b.set(db.collection("usernames").doc(lower),{uid:c.user.uid});
+      b.set(prof(c.user.uid),{username,usernameLower:lower,avatar:"🌋",best:0,total:0,games:0});
+      await b.commit();
+    }catch(e){await c.user.delete().catch(()=>{});throw new Error("That player name was just taken. Try another.")}
+    await syncAuthenticatedProfile(wrap(c.user),username);
+    await finishAuthenticatedEntry();
+    setAuthStatus("🔥 Account created!");
+  }catch(e){setAuthStatus("❌ "+err(e))}
+  finally{signingUp=false}
+});
+
+W("sendFuryPasswordReset",async()=>{try{
+  const email=($("authLoginEmail").value||"").trim().toLowerCase();
+  if(!email){setAuthStatus("📧 Enter your email first, then choose Forgot password.");return}
+  await auth.sendPasswordResetEmail(email);
+  setAuthStatus("📨 If that email is registered, a reset link has been sent.");
+}catch(e){setAuthStatus("❌ "+err(e))}});
+
+function resetLocalSession(){
+  ffUser=null; onlineTotals=null; activePlayer="Guest"; finalAvatar="🌋"; finalAvatarImage=null;
+}
+W("logoutFuryAccount",async()=>{
+  try{await auth.signOut()}catch(e){console.warn(e)}
+  await leaveMatch(); stopReq(); resetLocalSession();
+  const pw=$("authLoginPassword"); if(pw)pw.value="";
+  closeAuthGate(); show("home"); renderPlayerHistory(); updateHeader();
+  setAuthStatus("🚪 Logged out. Log in or sign up to play.");
+});
+W("deleteFuryAccount",async()=>{
+  if(!ffUser||!ffUser.id){alert("No account is signed in.");return}
+  const name=activePlayer, uid=ffUser.id;
+  if(!confirm('DELETE means DELETE.\n\nThis permanently deletes the account for "'+name+'" with its profile, scores and avatar. This cannot be undone.\n\nChoose Cancel if you only want to log out.'))return;
+  try{
+    const sc=await db.collection("scores").where("uid","==",uid).get();
+    const b=db.batch(); sc.forEach(d=>b.delete(d.ref)); b.delete(prof(uid)); await b.commit();
+    await db.collection("usernames").doc(name.toLowerCase()).delete().catch(()=>{});
+    await auth.currentUser.delete();
+    const ps=safeReadProfiles(); delete ps[name]; safeWriteProfiles(ps);
+    await leaveMatch(); stopReq(); resetLocalSession();
+    show("home"); renderPlayerHistory(); $("startScreen").classList.remove("hidden");
+    setAuthStatus("🗑️ Account permanently deleted.");
+  }catch(e){alert("Account was NOT fully deleted.\n\n"+err(e))}
+});
+
+/* restore a saved login when the page opens */
+let firstAuth=true;
+auth.onAuthStateChanged(async u=>{
+  if(firstAuth){
+    firstAuth=false;
+    if(u&&!signingUp){try{await syncAuthenticatedProfile(wrap(u));subscribeMultiplayerRequests()}catch(e){console.warn(e)}}
+  }else if(!u){ffUser=null;onlineTotals=null}
+});
+
+/* ---------- multiplayer (Firestore) ---------- */
+W("initMultiplayerBackend",async()=>{
+  if(!ffUser||!ffUser.id){setMpStatus("🔐 Please log in or create a FIRE & FURY account first.");return false}
+  await subscribeMultiplayerRequests();
+  setMpStatus("🟢 Online as "+activePlayer+". You can send a challenge request.");
+  return true;
+});
+W("subscribeMultiplayerRequests",async()=>{
+  if(!ffUser||!ffUser.id)return;
+  stopReq();
+  unsubReq=db.collection("matchRequests").where("toUid","==",ffUser.id).where("status","==","pending").onSnapshot(s=>{
+    s.docChanges().forEach(ch=>{
+      if(ch.type!=="added")return;
+      const r=ch.doc.data(), t=r.createdAt&&r.createdAt.toMillis?r.createdAt.toMillis():Date.now();
+      if(Date.now()-t>600000)return;
+      showIncomingRequest({id:ch.doc.id,from_user:r.fromUid});
+      if(!gameRunning)$("multiplayerModal").classList.add("show");
+    });
+  },e=>setMpStatus("⚠️ Realtime unavailable: "+err(e)));
+});
+W("sendMultiplayerRequest",async()=>{
+  const opp=cn($("mpOpponent").value);
+  if(!opp){setMpStatus("Enter the other player's username first.");return}
+  if(!await initMultiplayerBackend())return;
+  try{
+    const u=await db.collection("usernames").doc(opp.toLowerCase()).get();
+    if(!u.exists){setMpStatus("❌ That username is not registered online.");return}
+    const toUid=u.data().uid;
+    if(toUid===ffUser.id){setMpStatus("Choose another player.");return}
+    const ref=await db.collection("matchRequests").add({fromUid:ffUser.id,toUid,status:"pending",matchId:null,createdAt:TS()});
+    setMpStatus("📨 Request sent to "+opp+". Waiting for acceptance…");
+    waitForAcceptedMatch(ref.id);
+  }catch(e){setMpStatus("❌ Could not send request: "+err(e))}
+});
+W("waitForAcceptedMatch",function(id){
+  if(!id)return;
+  let done=false;
+  const un=db.collection("matchRequests").doc(id).onSnapshot(async s=>{
+    const r=s.data(); if(!r||done)return;
+    if(r.status==="declined"){done=true;un();setMpStatus("❌ Your opponent declined the request.")}
+    else if(r.status==="accepted"&&r.matchId){
+      done=true;un();
+      setMpStatus("✅ Opponent accepted! Opening the match room…");
+      await enterOnlineMatch(r.matchId);
+      const inc=$("mpIncoming");
+      if(inc)inc.innerHTML='<b>✅ Opponent accepted!</b><div class="ff-row">Choose the mission below, then press READY.</div>';
+      updateMpReadyButton();
+    }
+  },e=>setMpStatus("❌ "+err(e)));
+  setTimeout(()=>{if(!done){done=true;un();setMpStatus("⌛ The request timed out. Send a new one if you still want to play.")}},120000);
+});
+W("loadPendingRequest",async()=>{
+  try{
+    const s=await db.collection("matchRequests").where("toUid","==",ffUser.id).where("status","==","pending").limit(1).get();
+    if(!s.empty)showIncomingRequest({id:s.docs[0].id,from_user:s.docs[0].data().fromUid});
+    else{const el=$("mpIncoming");if(el)el.textContent="No incoming requests."}
+  }catch(e){console.warn(e)}
+});
+W("showIncomingRequest",async req=>{
+  const el=$("mpIncoming"); if(!el||!req)return;
+  let name="A player";
+  try{const d=(await prof(req.from_user).get()).data();if(d&&d.username)name=d.username}catch(_){}
+  el.textContent="";
+  const msg=document.createElement("span");
+  msg.innerHTML="⚔️ <b>"+escapeHistoryText(name)+"</b> challenged you. ";
+  const a=document.createElement("button"); a.className="btn"; a.type="button"; a.textContent="Accept";
+  a.addEventListener("click",()=>acceptMultiplayerRequest(req.id));
+  const d=document.createElement("button"); d.className="btn"; d.type="button"; d.textContent="Decline";
+  d.addEventListener("click",()=>declineMultiplayerRequest(req.id));
+  el.append(msg,a,d);
+});
+W("acceptMultiplayerRequest",async id=>{try{
+  const ref=db.collection("matchRequests").doc(id), r=(await ref.get()).data();
+  if(!r||r.status!=="pending"){setMpStatus("That request is no longer available.");return}
+  const m=await db.collection("matches").add({players:[r.fromUid,ffUser.id],status:"active",createdAt:TS()});
+  await ref.update({status:"accepted",matchId:m.id});
+  await enterOnlineMatch(m.id);
+  const inc=$("mpIncoming");
+  if(inc)inc.innerHTML='<b>✅ Request accepted. Match room created.</b><div class="ff-row">Choose the mission below, then press READY.</div>';
+  updateMpReadyButton();
+}catch(e){setMpStatus("❌ "+err(e))}});
+W("declineMultiplayerRequest",async id=>{try{
+  await db.collection("matchRequests").doc(id).update({status:"declined"});
+  $("mpIncoming").textContent="Request declined.";
+}catch(e){setMpStatus("❌ "+err(e))}});
+
+W("leaveMatch",async()=>{
+  const un=ffMatch.rawChannel;
+  ffMatch={id:null,rawChannel:null,channel:null,ready:false,opponentReady:false,opponentScore:0,opponentCombo:0,opponentDone:false,opponentGone:false,localDone:false,mission:null,opponentMission:null};
+  if(typeof un==="function"){try{un()}catch(_){}}
+});
+W("enterOnlineMatch",async matchId=>{
+  if(!ffUser)return;
+  if(ffMatch.id===matchId&&ffMatch.rawChannel)return;
+  await leaveMatch();
+  ffMatch.id=matchId;
+  setMpStatus("⚔️ Match found. Both players must press READY.");
+  ffMatch.rawChannel=db.collection("matches").doc(matchId).collection("events").orderBy("createdAt").onSnapshot(s=>{
+    s.docChanges().forEach(ch=>{
+      if(ch.type!=="added")return;
+      const d=ch.doc.data(); if(d.uid===ffUser.id)return;
+      try{handleRemoteGameEvent(JSON.parse(d.p))}catch(_){}
+    });
+  },e=>setMpStatus("⚠️ Match connection problem: "+err(e)));
+  ffMatch.channel={};
+  updateMpBattleBar("🟡 Waiting for both players…");
+  await mpSend({kind:"hello",userId:ffUser.id,username:activePlayer,mission:ffMatch.mission});
+  setMpStatus("🟢 Match room connected. Press READY to start.");
+  updateMpReadyButton();
+});
+W("mpSend",async payload=>{
+  if(!ffMatch.id||!ffMatch.channel)return;
+  if(payload.kind==="score"){const n=Date.now();if(n-lastScoreSend<1000)return;lastScoreSend=n}
+  try{
+    await db.collection("matches").doc(ffMatch.id).collection("events").add({uid:ffUser.id,p:JSON.stringify(payload),createdAt:TS()});
+  }catch(e){console.warn("Multiplayer send failed",e)}
+});
+};
+
+</script>
+<script>
+/* VOLCANO RUSH upgrade: runner sprites, cooling water shield, eruption waves, hearts, stars. Loads after the other scripts. */
+(function(){
+"use strict";
+const W=(n,f)=>{window[n]=f};
+const COOL_TIME=2.5;
+let heroKind="m", coolTimer=0, waveTimer=9, lastDir=1, moving=false;
+try{heroKind=localStorage.getItem("ff_vhero")==="f"?"f":"m"}catch(_){}
+
+/* ---------- sprite ---------- */
+function hero(c,kind,t,dir,mv,scared){
+  const f=kind==="f", sw=mv?Math.sin(t*16)*8:Math.sin(t*3)*1.5;
+  c.save(); c.scale(dir,1); c.lineCap="round"; c.lineJoin="round";
+  c.strokeStyle=f?"#7a3fa0":"#2f4a9a"; c.lineWidth=7;
+  c.beginPath(); c.moveTo(-4,12); c.lineTo(-4-sw,30); c.moveTo(4,12); c.lineTo(4+sw,30); c.stroke();
+  c.fillStyle="#2a1a14"; c.fillRect(-4-sw-5,28,10,5); c.fillRect(4+sw-5,28,10,5);
+  if(f){c.fillStyle="#5a2a14"; c.beginPath(); c.ellipse(-9,-14,6,13,.25,0,6.3); c.fill();}
+  c.fillStyle=f?"#1fb5a5":"#e8472a"; c.beginPath();
+  if(f){c.moveTo(-8,-8);c.lineTo(8,-8);c.lineTo(12,16);c.lineTo(-12,16)}
+  else{c.moveTo(-9,-8);c.lineTo(9,-8);c.lineTo(8,14);c.lineTo(-8,14)}
+  c.closePath(); c.fill();
+  c.strokeStyle="#f1c27d"; c.lineWidth=5; c.beginPath();
+  c.moveTo(-8,-4); c.lineTo(-12+sw*.6,scared?-18:8); c.moveTo(8,-4); c.lineTo(12-sw*.6,scared?-18:8); c.stroke();
+  c.fillStyle="#f1c27d"; c.beginPath(); c.arc(0,-19,10,0,6.3); c.fill();
+  c.fillStyle=f?"#5a2a14":"#3a2314"; c.beginPath(); c.arc(0,-21,10.5,Math.PI,6.3); c.fill();
+  c.fillStyle="#222"; c.fillRect(2,-21,2,3); c.fillRect(-4,-21,2,3);
+  c.beginPath(); c.arc(1,-14,scared?2.2:1.6,0,6.3); c.fill();
+  c.restore();
+}
+
+/* ---------- character picker on the missions screen ---------- */
+const playBtn=document.querySelector("button[onclick=\"startGame('volcano')\"]");
+if(playBtn){
+  const box=document.createElement("div");
+  box.className="ff-avatar-box"; box.style.margin="12px 0";
+  box.innerHTML="<b>🏃 CHOOSE YOUR RUNNER</b>";
+  const row=document.createElement("div");
+  row.style.cssText="display:flex;gap:12px;justify-content:center;margin:10px 0";
+  const btns={};
+  const mark=()=>Object.keys(btns).forEach(k=>{btns[k].style.borderColor=k===heroKind?"#ffd86b":"#8e481d";btns[k].style.boxShadow=k===heroKind?"0 0 14px #ff8a20":"none"});
+  [["m","MAN"],["f","WOMAN"]].forEach(([k,label])=>{
+    const b=document.createElement("button");
+    b.className="btn"; b.type="button"; b.style.padding="8px 14px";
+    b.innerHTML='<canvas width="64" height="80" style="display:block;margin:0 auto"></canvas><div>'+label+"</div>";
+    const c=b.querySelector("canvas").getContext("2d"); c.translate(32,44); hero(c,k,0,1,false,false);
+    b.onclick=()=>{heroKind=k;try{localStorage.setItem("ff_vhero",k)}catch(_){} mark()};
+    btns[k]=b; row.appendChild(b);
+  });
+  box.appendChild(row); playBtn.before(box); mark();
+}
+
+/* ---------- new pickups ---------- */
+OBJECT_EMOJI.heart=["❤️",34];
+OBJECT_EMOJI.star=["⭐",34];
+
+const origSpawn=window.spawnObject;
+W("spawnObject",function(){
+  origSpawn();
+  if(gameType!=="volcano")return;
+  const o=objects[objects.length-1]; if(!o)return;
+  if(o.type==="rock"){o.drift=(rng()-.5)*90;return}
+  const r=rng();
+  if(r<.04){o.type="heart";o.value=150}
+  else if(r<.10){o.type="star";o.value=500}
+});
+
+const origCollect=window.collectObject;
+W("collectObject",function(o){
+  origCollect(o);
+  if(gameType!=="volcano")return;
+  if(o.type==="water"){
+    coolTimer=COOL_TIME; invincibilityTimer=Math.max(invincibilityTimer,COOL_TIME);
+    floatingText(o.x,o.y-30,"❄️ COOLED! SHIELD 2.5s");
+    createParticles(o.x,o.y,18,"#9fe0ff");
+  }else if(o.type==="heart"){
+    lives=Math.min(5,lives+1); updateGameUI();
+    floatingText(o.x,o.y-30,"❤️ +1 LIFE");
+    createParticles(o.x,o.y,16,"#ff6b8a");
+  }
+});
+
+/* ---------- eruption waves ---------- */
+function eruptionWave(){
+  const n=4+Math.floor(rng()*4);
+  for(let i=0;i<n;i++){
+    objects.push({x:30+rng()*(GAME_W-60),y:-40-rng()*260,size:44,speed:190+rng()*120,rotation:0,spin:(rng()-.5)*6,drift:(rng()-.5)*120,type:"rock",value:0,good:false,hazard:true,collectible:false,shootable:false});
+  }
+  screenShake=Math.max(screenShake,9);
+  const b=$("comboBanner");
+  if(b){b.textContent="🌋 ERUPTION! RUN FOR IT!";b.classList.remove("show","break");void b.offsetWidth;b.classList.add("show")}
+}
+
+const origStart=window.startGame;
+W("startGame",function(type,mp){
+  const r=origStart(type,mp);
+  coolTimer=0; waveTimer=5+rng()*6; lastDir=1;
+  if(type==="volcano"&&gameRunning){
+    $("gameMessage").textContent="Run from the eruption! 🪨 rocks cost a life · 💧 cools you: 2.5s shield · ❤️ extra life · ⭐ +500";
+  }
+  return r;
+});
+
+const origUpdate=window.update;
+W("update",function(dt){
+  const vol=gameType==="volcano"&&gameRunning;
+  if(vol){
+    if(keys.left)lastDir=-1; if(keys.right)lastDir=1;
+    moving=keys.left||keys.right;
+    coolTimer=Math.max(0,coolTimer-dt);
+    waveTimer-=dt;
+    if(waveTimer<=0){waveTimer=7+rng()*9;eruptionWave()}
+    objects.forEach(o=>{if(o.drift)o.x=Math.max(20,Math.min(GAME_W-20,o.x+o.drift*dt))});
+  }
+  origUpdate(dt);
+  if(vol&&gameRunning&&coolTimer>0){
+    const hit=[];
+    objects=objects.filter(o=>{
+      if(o.type==="rock"&&collision(player,{x:o.x,y:o.y,width:o.size+10,height:o.size+10})){hit.push(o);return false}
+      return true;
+    });
+    hit.forEach(o=>{createParticles(o.x,o.y,10,"#cfeeff");floatingText(o.x,o.y,"💨 STEAM!")});
+  }
+});
+
+/* ---------- drawing ---------- */
+const origPlayer=window.drawPlayer;
+W("drawPlayer",function(){
+  if(gameType!=="volcano")return origPlayer();
+  const t=performance.now()/1000;
+  ctx.save();
+  ctx.translate(player.x,player.y-2);
+  if(coolTimer>0){
+    const g=ctx.createRadialGradient(0,0,10,0,0,46);
+    g.addColorStop(0,"rgba(120,210,255,.05)"); g.addColorStop(1,"rgba(120,210,255,"+(.35+Math.sin(t*10)*.1)+")");
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,46,0,6.3); ctx.fill();
+    ctx.strokeStyle="#bfeaff"; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(0,0,46,-Math.PI/2,-Math.PI/2+6.28*(coolTimer/COOL_TIME)); ctx.stroke();
+  }else if(invincibilityTimer>0&&Math.floor(invincibilityTimer*12)%2===0){
+    ctx.globalAlpha=.35;
+  }
+  ctx.scale(1.2,1.2);
+  hero(ctx,heroKind,t,lastDir,moving,lives<=1);
+  ctx.restore();
+});
+
+const origBG=window.drawBackground;
+W("drawBackground",function(){
+  origBG();
+  if(gameType!=="volcano")return;
+  const t=performance.now()/1000;
+  ctx.save(); ctx.translate(GAME_W/2-480,GAME_H*.36-216);
+  ctx.fillStyle="#2c120b";
+  ctx.beginPath(); ctx.moveTo(230,440); ctx.lineTo(425,216); ctx.lineTo(535,216); ctx.lineTo(730,440); ctx.closePath(); ctx.fill();
+  const g=ctx.createRadialGradient(480,216,4,480,216,70+Math.sin(t*4)*8);
+  g.addColorStop(0,"rgba(255,230,120,.95)"); g.addColorStop(.4,"rgba(255,110,30,.6)"); g.addColorStop(1,"rgba(255,60,10,0)");
+  ctx.fillStyle=g; ctx.fillRect(380,130,200,170);
+  ctx.strokeStyle="rgba(255,120,40,.7)"; ctx.lineWidth=4; ctx.lineCap="round";
+  ctx.beginPath(); ctx.moveTo(462,222); ctx.quadraticCurveTo(440,300,400,420); ctx.moveTo(498,222); ctx.quadraticCurveTo(525,310,570,420); ctx.stroke();
+  ctx.restore();
+});
+
+/* ---------- update the How to Play text ---------- */
+document.querySelectorAll("#howModal .how-sec").forEach(e=>{
+  if(e.textContent.includes("Volcano Rush")){
+    e.innerHTML="<b>🌋 Volcano Rush (45s)</b><br>Pick your runner and escape the eruption. No shooting. Catch 💧 +100, 🔥 +150, 💨 +200, ☁️ +250.<br>🪨 <b>Rocks cost a life.</b> Every so often a big <b>eruption wave</b> hits from random spots.<br>💧 <b>Water cools you:</b> 2.5s shield, and rocks turn to steam.<br>❤️ Extra life · ⭐ +500. Reach <b>2,000 points</b>.";
+  }
+});
+})();
+
+</script>
+<script>
+(function(){
+  var SETS=[["https://www.gstatic.com/firebasejs/10.12.2/firebase-","-compat.js"],["https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-","-compat.min.js"]];
+  function load(u){return new Promise(function(res,rej){var s=document.createElement("script");s.src=u;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+  async function boot(){
+    for(var i=0;i<SETS.length;i++){
+      try{
+        for(const n of ["app","auth","firestore"]) await load(SETS[i][0]+n+SETS[i][1]);
+        if(window.firebase&&firebase.firestore){ ffStartBackend(); return; }
+      }catch(e){}
+    }
+    console.warn("Firebase could not be loaded. Online features are unavailable.");
+    var st=document.getElementById("authStatus");
+    if(st) st.textContent="⚠️ Could not reach the online service. Check your connection and reload.";
+  }
+  boot();
+})();
+
+(function(){var so=screen.orientation;if(!so)return;var was=so.type.indexOf("portrait")===0;
+so.addEventListener("change",function(){var now=so.type.indexOf("portrait")===0;if(now===was)return;if(typeof gameRunning!=="undefined"&&gameRunning)return;location.reload();});})();
+</script>
+</body>
+</html>
